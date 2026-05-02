@@ -1,0 +1,880 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Vendée Va'a — Régie</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;500;600;700;800;900&family=Barlow:wght@300;400;500;600&display=swap');
+
+:root {
+  --blue:  #2d6ea8; --blue2: #1a4a78; --blue3: #4490c8;
+  --navy:  #0d1f38; --deep:  #070e1c; --panel: #0b1826;
+  --white: #f2f6fa; --mist:  #7aa0c0; --line:  rgba(45,110,168,0.18);
+  --red: #e84040; --green: #2ecc71;
+}
+* { box-sizing:border-box; margin:0; padding:0; }
+body { background:var(--deep); color:var(--white); font-family:'Barlow',sans-serif; height:100vh; display:flex; flex-direction:column; overflow:hidden; font-size:14px; }
+
+/* ─ TOPBAR ─ */
+.topbar { background:var(--navy); border-bottom:2px solid var(--blue); padding:0 20px; height:50px; display:flex; align-items:center; gap:14px; flex-shrink:0; }
+.tb-sep  { width:1px; height:20px; background:var(--line); }
+.tb-lbl  { font-family:'Barlow Condensed',sans-serif; font-size:11px; font-weight:700; letter-spacing:3px; text-transform:uppercase; color:var(--mist); }
+.tb-right { margin-left:auto; display:flex; align-items:center; gap:8px; }
+.ws-badge { display:flex; align-items:center; gap:7px; padding:5px 12px; border-radius:4px; font-family:'Barlow Condensed',sans-serif; font-size:10px; font-weight:700; letter-spacing:2px; text-transform:uppercase; border:1px solid rgba(45,110,168,.3); background:rgba(45,110,168,.08); color:var(--mist); transition:all .3s; }
+.ws-badge.ok  { color:var(--green); border-color:rgba(46,204,113,.4); background:rgba(46,204,113,.06); }
+.ws-badge.err { color:var(--red);   border-color:rgba(232,64,64,.35);  background:rgba(232,64,64,.07); }
+.wdot { width:7px; height:7px; border-radius:50%; background:currentColor; }
+.wdot.blink { animation:bl 1.4s infinite; }
+@keyframes bl { 0%,100%{opacity:1}50%{opacity:.2} }
+.save-btn { background:rgba(45,110,168,.15); border:1px solid rgba(45,110,168,.3); border-radius:3px; padding:5px 12px; color:var(--blue3); font-family:'Barlow Condensed',sans-serif; font-size:10px; font-weight:700; letter-spacing:1.5px; text-transform:uppercase; cursor:pointer; transition:all .15s; }
+.save-btn:hover { background:rgba(45,110,168,.3); color:#fff; }
+.save-btn.saved { color:var(--green); border-color:rgba(46,204,113,.4); }
+
+/* OBS */
+.obs-bar { background:rgba(45,110,168,.05); border-bottom:1px solid var(--line); padding:7px 20px; display:flex; align-items:center; gap:9px; flex-shrink:0; font-family:'Barlow Condensed',sans-serif; font-size:12px; color:rgba(122,160,192,.5); }
+.obs-bar strong { color:var(--white); font-weight:700; }
+.obs-url { background:rgba(45,110,168,.14); border:1px solid rgba(45,110,168,.28); border-radius:3px; padding:3px 10px; color:var(--blue3); font-weight:700; }
+.obs-copy { background:rgba(45,110,168,.18); border:1px solid rgba(45,110,168,.3); border-radius:3px; padding:3px 10px; color:var(--blue3); cursor:pointer; font-family:'Barlow Condensed',sans-serif; font-size:10px; font-weight:700; letter-spacing:1px; text-transform:uppercase; transition:all .15s; }
+.obs-copy:hover { background:rgba(45,110,168,.38); color:#fff; }
+
+/* ─ TABS ─ */
+.tabs { background:var(--navy); border-bottom:1px solid var(--line); display:flex; flex-shrink:0; }
+.tab { padding:0 22px; height:42px; display:flex; align-items:center; gap:8px; cursor:pointer; font-family:'Barlow Condensed',sans-serif; font-size:12px; font-weight:700; letter-spacing:2px; text-transform:uppercase; color:rgba(122,160,192,.45); border-bottom:2px solid transparent; transition:all .18s; position:relative; top:1px; }
+.tab:hover { color:var(--mist); }
+.tab.active { color:var(--white); border-bottom-color:var(--blue3); }
+.tab-dot { width:7px; height:7px; border-radius:50%; background:var(--green); display:none; box-shadow:0 0 5px rgba(46,204,113,.6); }
+.tab.live .tab-dot { display:block; }
+
+/* ─ CONTENT AREA ─ */
+.content-area { flex:1; overflow:hidden; display:flex; }
+.tab-panel { display:none; flex:1; overflow:hidden; }
+.tab-panel.active { display:flex; }
+
+/* ─ COMMON LAYOUT ─ */
+.two-col { display:grid; grid-template-columns:270px 1fr; overflow:hidden; flex:1; }
+.three-col { display:grid; grid-template-columns:260px 1fr 300px; overflow:hidden; flex:1; }
+
+.col { display:flex; flex-direction:column; border-right:1px solid var(--line); overflow:hidden; }
+.col:last-child { border-right:none; }
+.col-head { padding:13px 15px 11px; border-bottom:1px solid var(--line); background:rgba(45,110,168,.04); flex-shrink:0; }
+.col-head-title { font-family:'Barlow Condensed',sans-serif; font-size:10px; font-weight:800; letter-spacing:3px; text-transform:uppercase; color:var(--mist); margin-bottom:2px; }
+.col-head-desc  { font-size:12px; color:rgba(122,160,192,.38); }
+.col-body { flex:1; overflow-y:auto; padding:10px; display:flex; flex-direction:column; gap:5px; }
+.col-body::-webkit-scrollbar{width:3px;} .col-body::-webkit-scrollbar-thumb{background:rgba(45,110,168,.3);border-radius:2px;}
+
+/* ─ INPUTS ─ */
+.field { display:flex; gap:7px; padding:10px 12px; border-bottom:1px solid var(--line); flex-shrink:0; }
+.inp {
+  flex:1; background:rgba(255,255,255,.04); border:1px solid var(--line); border-radius:5px;
+  padding:9px 11px; color:var(--white); font-family:'Barlow',sans-serif; font-size:13px; outline:none;
+  transition:border-color .2s;
+}
+.inp:focus { border-color:var(--blue); }
+.inp::placeholder { color:rgba(122,160,192,.25); }
+.sel {
+  flex:1; background:rgba(255,255,255,.04); border:1px solid var(--line); border-radius:5px;
+  padding:9px 26px 9px 11px; color:var(--white); font-family:'Barlow',sans-serif; font-size:13px;
+  outline:none; cursor:pointer; appearance:none;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%232d6ea8' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat:no-repeat; background-position:right 9px center; transition:border-color .2s;
+}
+.sel:focus { border-color:var(--blue); }
+.sel option { background:#0d1f38; }
+
+.btn { border:none; border-radius:5px; font-family:'Barlow Condensed',sans-serif; font-size:11px; font-weight:800; letter-spacing:1px; text-transform:uppercase; cursor:pointer; transition:all .14s; padding:9px 14px; white-space:nowrap; }
+.btn-blue  { background:var(--blue);  color:#fff; }
+.btn-blue:hover  { background:var(--blue2); }
+.btn-muted { background:rgba(255,255,255,.05); border:1px solid var(--line); color:var(--mist); }
+.btn-muted:hover { background:rgba(45,110,168,.15); color:#fff; border-color:rgba(45,110,168,.4); }
+
+/* ─ CHIPS / ROWS ─ */
+.chip { display:flex; align-items:center; gap:8px; background:rgba(255,255,255,.025); border:1px solid var(--line); border-radius:5px; padding:9px 10px; animation:fi .18s ease; transition:border-color .14s; }
+.chip:hover { border-color:rgba(45,110,168,.3); }
+@keyframes fi { from{opacity:0;transform:translateY(-3px)} to{opacity:1;transform:translateY(0)} }
+.chip-pos { width:26px; height:26px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-family:'Barlow Condensed',sans-serif; font-size:11px; font-weight:800; background:rgba(45,110,168,.1); border:1px solid rgba(45,110,168,.22); color:rgba(122,160,192,.5); flex-shrink:0; }
+.chip-pos.ranked { background:rgba(68,144,200,.18); border-color:var(--blue3); color:var(--blue3); }
+.chip-name { flex:1; font-family:'Barlow Condensed',sans-serif; font-size:14px; font-weight:700; letter-spacing:.3px; text-transform:uppercase; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.chip-label { font-family:'Barlow Condensed',sans-serif; font-size:10px; font-weight:700; letter-spacing:1px; text-transform:uppercase; color:rgba(68,144,200,.45); white-space:nowrap; }
+.icon-btn { background:transparent; border:none; cursor:pointer; border-radius:3px; width:26px; height:26px; display:flex; align-items:center; justify-content:center; font-size:13px; transition:all .12s; flex-shrink:0; }
+.icon-btn.del { color:rgba(232,64,64,.3); }
+.icon-btn.del:hover { background:rgba(232,64,64,.12); color:var(--red); }
+.icon-btn.action { color:var(--mist); }
+.icon-btn.action:hover { background:rgba(45,110,168,.2); color:#fff; }
+.icon-btn:disabled { opacity:.12; cursor:default; }
+
+/* Rank row */
+.rank-row { display:flex; align-items:center; background:rgba(255,255,255,.03); border:1px solid var(--line); border-radius:5px; overflow:hidden; cursor:grab; user-select:none; animation:fi .18s ease; transition:border-color .14s, background .14s, box-shadow .14s; }
+.rank-row:hover { border-color:rgba(45,110,168,.32); }
+.rank-row.drag-over { border-color:var(--blue3); background:rgba(45,110,168,.1); box-shadow:0 0 0 1px var(--blue3); }
+.rank-row.dragging  { opacity:.3; }
+.rr-num { width:46px; height:50px; display:flex; align-items:center; justify-content:center; font-family:'Barlow Condensed',sans-serif; font-size:22px; font-weight:900; color:rgba(255,255,255,.13); background:rgba(45,110,168,.04); border-right:1px solid var(--line); flex-shrink:0; }
+.rr-num.n1{color:var(--blue3);background:rgba(68,144,200,.1);}
+.rr-num.n2{color:rgba(68,144,200,.6);}
+.rr-num.n3{color:rgba(68,144,200,.38);}
+.rr-handle { padding:0 7px; color:rgba(122,160,192,.16); font-size:11px; cursor:grab; }
+.rr-name { flex:1; padding:0 10px; font-family:'Barlow Condensed',sans-serif; font-size:15px; font-weight:700; letter-spacing:.3px; text-transform:uppercase; color:rgba(255,255,255,.82); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.rr-num.n1+.rr-handle+.rr-name{color:#fff;font-size:16px;}
+.rr-arrows { display:flex; flex-direction:column; border-left:1px solid var(--line); }
+.arr-btn { background:transparent; border:none; width:30px; height:25px; display:flex; align-items:center; justify-content:center; cursor:pointer; color:var(--mist); font-size:11px; transition:background .12s,color .12s; }
+.arr-btn:hover { background:rgba(45,110,168,.2); color:#fff; }
+.arr-btn:disabled{opacity:.12;cursor:default;}
+.arr-btn+.arr-btn{border-top:1px solid var(--line);}
+.rr-del { background:transparent; border:none; border-left:1px solid var(--line); width:30px; height:50px; display:flex; align-items:center; justify-content:center; cursor:pointer; color:rgba(232,64,64,.3); font-size:14px; transition:all .12s; flex-shrink:0; }
+.rr-del:hover{background:rgba(232,64,64,.1);color:var(--red);}
+
+/* ─ BIG BUTTONS ─ */
+.big-btn { width:100%; border:none; border-radius:7px; cursor:pointer; padding:14px 16px; display:flex; flex-direction:column; align-items:flex-start; text-align:left; transition:all .17s; position:relative; overflow:hidden; margin-bottom:8px; }
+.big-btn:last-child { margin-bottom:0; }
+.bbt { font-family:'Barlow Condensed',sans-serif; font-size:16px; font-weight:900; letter-spacing:1.5px; text-transform:uppercase; line-height:1; margin-bottom:4px; }
+.bbd { font-family:'Barlow',sans-serif; font-size:12px; font-weight:400; line-height:1.4; opacity:.7; }
+.bbv-blue  { background:linear-gradient(135deg,var(--blue),var(--blue2)); color:#fff; box-shadow:0 4px 18px rgba(45,110,168,.28); }
+.bbv-blue:hover  { transform:translateY(-1px); box-shadow:0 7px 26px rgba(45,110,168,.42); }
+.bbv-green { background:linear-gradient(135deg,#1e6844,#124e30); color:#fff; box-shadow:0 4px 16px rgba(30,104,68,.22); }
+.bbv-green:hover { transform:translateY(-1px); box-shadow:0 7px 22px rgba(30,104,68,.38); }
+.bbv-teal  { background:linear-gradient(135deg,#1a5e72,#0f3a48); color:#fff; box-shadow:0 4px 16px rgba(26,94,114,.22); }
+.bbv-teal:hover  { transform:translateY(-1px); box-shadow:0 7px 22px rgba(26,94,114,.38); }
+.bbv-purple { background:linear-gradient(135deg,#4a2a78,#2e1a4e); color:#fff; box-shadow:0 4px 16px rgba(74,42,120,.22); }
+.bbv-purple:hover { transform:translateY(-1px); box-shadow:0 7px 22px rgba(74,42,120,.38); }
+.bbv-red   { background:rgba(232,64,64,.08); border:1px solid rgba(232,64,64,.2); color:rgba(232,64,64,.7); }
+.bbv-red:hover { background:rgba(232,64,64,.16); color:var(--red); border-color:rgba(232,64,64,.4); }
+.big-btn.live-on { box-shadow:0 0 0 2px var(--green), 0 4px 18px rgba(46,204,113,.2) !important; }
+.live-flag { display:none; align-items:center; gap:5px; margin-top:7px; font-family:'Barlow Condensed',sans-serif; font-size:10px; font-weight:700; letter-spacing:2px; text-transform:uppercase; }
+.live-flag .ldot2 { width:5px; height:5px; border-radius:50%; background:var(--green); animation:bl 1.4s infinite; }
+.big-btn.live-on .bbd { display:none; }
+.big-btn.live-on .live-flag { display:flex; }
+
+/* ─ STATUS ─ */
+.status-card { background:rgba(255,255,255,.02); border:1px solid var(--line); border-radius:5px; padding:11px 13px; }
+.status-line { display:flex; align-items:center; gap:8px; }
+.status-line+.status-line { margin-top:7px; }
+.s-dot { width:8px; height:8px; border-radius:50%; background:rgba(122,160,192,.18); flex-shrink:0; transition:all .3s; }
+.s-dot.on { background:var(--green); box-shadow:0 0 7px rgba(46,204,113,.5); }
+.s-key { font-family:'Barlow Condensed',sans-serif; font-size:12px; font-weight:600; letter-spacing:.4px; color:rgba(122,160,192,.45); white-space:nowrap; }
+.s-val { font-family:'Barlow Condensed',sans-serif; font-size:13px; font-weight:700; color:var(--white); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.sec-lbl { font-family:'Barlow Condensed',sans-serif; font-size:10px; font-weight:800; letter-spacing:3px; text-transform:uppercase; color:rgba(122,160,192,.38); margin-bottom:9px; display:flex; align-items:center; gap:8px; }
+.sec-lbl::after { content:''; flex:1; height:1px; background:var(--line); }
+
+/* ─ BCAST COLUMN ─ */
+.bcast-block { padding:14px 15px; border-bottom:1px solid var(--line); }
+.bcast-inner { flex:1; overflow-y:auto; }
+.bcast-inner::-webkit-scrollbar{width:3px;} .bcast-inner::-webkit-scrollbar-thumb{background:rgba(45,110,168,.3);border-radius:2px;}
+
+/* ─ MEMBERS EDITOR ─ */
+.member-card { background:rgba(255,255,255,.03); border:1px solid var(--line); border-radius:7px; padding:12px; display:flex; gap:12px; align-items:flex-start; animation:fi .2s ease; }
+.member-photo-area { flex-shrink:0; display:flex; flex-direction:column; align-items:center; gap:6px; }
+.member-photo-preview { width:64px; height:64px; border-radius:50%; object-fit:cover; border:2px solid rgba(45,110,168,.3); background:rgba(45,110,168,.12); display:flex; align-items:center; justify-content:center; cursor:pointer; overflow:hidden; transition:border-color .2s; }
+.member-photo-preview:hover { border-color:var(--blue3); }
+.member-photo-preview img { width:100%; height:100%; object-fit:cover; }
+.member-photo-preview svg { width:28px; height:28px; opacity:.3; }
+.photo-hint { font-family:'Barlow Condensed',sans-serif; font-size:9px; font-weight:700; letter-spacing:1px; text-transform:uppercase; color:rgba(122,160,192,.3); text-align:center; }
+.member-fields { flex:1; display:grid; grid-template-columns:1fr 1fr; gap:6px; }
+.member-fields .inp-sm { background:rgba(255,255,255,.04); border:1px solid var(--line); border-radius:4px; padding:7px 10px; color:var(--white); font-family:'Barlow',sans-serif; font-size:12px; outline:none; transition:border-color .2s; width:100%; }
+.member-fields .inp-sm:focus { border-color:var(--blue); }
+.member-fields .inp-sm::placeholder { color:rgba(122,160,192,.25); }
+.member-remove { align-self:flex-start; }
+.file-input { display:none; }
+
+/* ─ SPONSOR CARD ─ */
+.sponsor-item { display:flex; flex-direction:column; background:rgba(255,255,255,.025); border:1px solid var(--line); border-radius:7px; overflow:hidden; animation:fi .2s ease; }
+.sponsor-top { display:flex; align-items:center; gap:10px; padding:10px 12px; border-bottom:1px solid var(--line); }
+.sponsor-logo-thumb { width:44px; height:44px; border-radius:4px; object-fit:contain; background:rgba(45,110,168,.1); border:1px solid rgba(45,110,168,.2); cursor:pointer; display:flex; align-items:center; justify-content:center; overflow:hidden; flex-shrink:0; }
+.sponsor-logo-thumb img { max-width:100%; max-height:100%; object-fit:contain; }
+.sponsor-name-inp { flex:1; background:transparent; border:none; color:var(--white); font-family:'Barlow Condensed',sans-serif; font-size:16px; font-weight:700; letter-spacing:.5px; text-transform:uppercase; outline:none; }
+.sponsor-name-inp::placeholder { color:rgba(122,160,192,.28); font-weight:400; text-transform:none; }
+.sponsor-desc-inp { background:transparent; border:none; border-top:1px solid var(--line); padding:8px 12px; color:rgba(255,255,255,.6); font-family:'Barlow',sans-serif; font-size:12px; outline:none; resize:none; height:52px; width:100%; }
+.sponsor-desc-inp::placeholder { color:rgba(122,160,192,.22); }
+
+/* ─ EMPTY ─ */
+.empty { font-family:'Barlow Condensed',sans-serif; font-size:11px; font-weight:700; letter-spacing:2px; text-transform:uppercase; color:rgba(122,160,192,.2); padding:18px 0; text-align:center; }
+
+/* ─ TOAST ─ */
+.toast { position:fixed; bottom:18px; right:18px; background:var(--navy); border:1px solid var(--blue); color:var(--blue3); padding:11px 18px; border-radius:5px; font-family:'Barlow Condensed',sans-serif; font-size:13px; font-weight:700; box-shadow:0 8px 28px rgba(0,0,0,.5); transform:translateY(70px); opacity:0; transition:all .3s cubic-bezier(0.34,1.56,0.64,1); z-index:999; }
+.toast.show { transform:translateY(0); opacity:1; }
+
+/* Modal */
+.modal-bg { position:fixed; inset:0; background:rgba(0,0,0,.75); z-index:900; display:none; align-items:center; justify-content:center; }
+.modal-bg.open { display:flex; }
+.modal { background:#0b1826; border:1px solid rgba(45,110,168,.3); border-radius:10px; padding:24px; width:420px; max-width:92vw; }
+.modal h3 { font-family:'Barlow Condensed',sans-serif; font-size:16px; font-weight:800; letter-spacing:2px; text-transform:uppercase; color:var(--white); margin-bottom:14px; }
+.modal-btns { display:flex; gap:8px; margin-top:16px; justify-content:flex-end; }
+</style>
+</head>
+<body>
+
+<!-- TOPBAR -->
+<div class="topbar">
+  <svg height="26" viewBox="0 0 210 30" xmlns="http://www.w3.org/2000/svg" fill="none">
+    <path d="M2 11 C6 7 10 7 14 11 C18 15 22 15 26 11" stroke="#2d6ea8" stroke-width="2.1" stroke-linecap="round"/>
+    <path d="M2 17 C6 13 10 13 14 17 C18 21 22 21 26 17" stroke="#2d6ea8" stroke-width="2.1" stroke-linecap="round"/>
+    <path d="M2 11 C0 6 2 2 7 3 C11 4 14 7 12 11" stroke="#2d6ea8" stroke-width="1.3" stroke-linecap="round" opacity="0.5"/>
+    <text x="30" y="19" font-family="Georgia,serif" font-size="17" font-weight="700" fill="#2d6ea8" font-style="italic">Vendée Va'a</text>
+    <text x="33" y="27" font-family="'Barlow Condensed',sans-serif" font-size="7" fill="#2d6ea8" letter-spacing="3" opacity="0.55">LES SABLES D'OLONNE</text>
+    <path d="M170 11 C174 7 178 7 182 11 C186 15 190 15 194 11" stroke="#2d6ea8" stroke-width="2.1" stroke-linecap="round"/>
+    <path d="M170 17 C174 13 178 13 182 17 C186 21 190 21 194 17" stroke="#2d6ea8" stroke-width="2.1" stroke-linecap="round"/>
+    <path d="M194 11 C196 6 194 2 189 3 C185 4 182 7 184 11" stroke="#2d6ea8" stroke-width="1.3" stroke-linecap="round" opacity="0.5"/>
+  </svg>
+  <div class="tb-sep"></div>
+  <span class="tb-lbl">Panneau de Régie</span>
+  <div class="tb-right">
+    <button class="save-btn" id="saveBtn" onclick="manualSave()">Sauvegarder</button>
+    <div class="ws-badge" id="wsBadge"><div class="wdot blink"></div><span id="wsLabel">Connexion...</span></div>
+  </div>
+</div>
+
+<!-- OBS -->
+<div class="obs-bar">
+  <strong>OBS :</strong>
+  <span class="obs-url">http://localhost:8765/overlay</span>
+  <button class="obs-copy" onclick="copyObs()">Copier l'URL</button>
+  &nbsp;·&nbsp; 1920×1080 · Fond transparent
+</div>
+
+<!-- TABS -->
+<div class="tabs">
+  <div class="tab active" onclick="switchTab('classement')" id="tab-classement">
+    <div class="tab-dot"></div>Classement
+  </div>
+  <div class="tab" onclick="switchTab('encours')" id="tab-encours">
+    <div class="tab-dot"></div>En course
+  </div>
+  <div class="tab" onclick="switchTab('equipes')" id="tab-equipes">
+    Compositions
+  </div>
+  <div class="tab" onclick="switchTab('partenaires')" id="tab-partenaires">
+    Partenaires
+  </div>
+</div>
+
+<div class="content-area">
+
+<!-- ════════════════════════════════════════════
+  ONGLET 1 — CLASSEMENT
+════════════════════════════════════════════ -->
+<div class="tab-panel active" id="panel-classement">
+<div class="three-col">
+
+  <!-- Col 1 : pirogues -->
+  <div class="col">
+    <div class="col-head">
+      <div class="col-head-title">Pirogues participantes</div>
+      <div class="col-head-desc">Ajoutez toutes les équipes</div>
+    </div>
+    <div class="field">
+      <input type="text" class="inp" id="teamInput" placeholder="Nom de la pirogue..." maxlength="40"/>
+      <button class="btn btn-blue" onclick="addTeam()">Ajouter</button>
+    </div>
+    <div class="col-body" id="teamPool"><div class="empty">Aucune pirogue</div></div>
+  </div>
+
+  <!-- Col 2 : classement -->
+  <div class="col">
+    <div class="col-head">
+      <div class="col-head-title">Classement officiel</div>
+      <div class="col-head-desc">Glisser-déposer ou flèches ▲▼</div>
+    </div>
+    <div class="field">
+      <select class="sel" id="addSel"><option value="">Choisir une pirogue à classer...</option></select>
+      <button class="btn btn-blue" onclick="addToRanking()">+ Classer</button>
+    </div>
+    <div class="col-body" id="rankList"
+         ondragover="onDragOver(event)" ondrop="onDrop(event)">
+      <div class="empty">Aucune pirogue classée</div>
+    </div>
+  </div>
+
+  <!-- Col 3 : diffusion classement -->
+  <div class="col">
+    <div class="col-head">
+      <div class="col-head-title">Diffusion OBS</div>
+      <div class="col-head-desc">Ce qui apparaît à l'écran</div>
+    </div>
+    <div class="bcast-inner">
+      <div class="bcast-block">
+        <div class="sec-lbl">Statut actuel</div>
+        <div class="status-card">
+          <div class="status-line"><div class="s-dot" id="stDotC"></div><span class="s-key">Classement</span><span class="s-val" id="stValC">Masqué</span></div>
+          <div class="status-line"><div class="s-dot" id="stDotB"></div><span class="s-key">Bandeau arrivée</span><span class="s-val" id="stValB">Masqué</span></div>
+        </div>
+      </div>
+      <div class="bcast-block">
+        <div class="sec-lbl">Afficher le classement</div>
+        <button class="big-btn bbv-blue" id="btnC" onclick="showClassement()">
+          <div class="bbt">Envoyer le classement sur OBS</div>
+          <div class="bbd">Tableau centré avec toutes les pirogues classées</div>
+          <div class="live-flag"><div class="ldot2"></div>Classement en direct</div>
+        </button>
+      </div>
+      <div class="bcast-block">
+        <div class="sec-lbl">Annoncer une arrivée</div>
+        <select class="sel" id="bnTeam" style="margin-bottom:7px;width:100%"><option value="">Pirogue...</option></select>
+        <select class="sel" id="bnPlace" style="margin-bottom:7px;width:100%"><option value="">Place obtenue...</option></select>
+        <button class="big-btn bbv-green" id="btnB" onclick="showBanner()">
+          <div class="bbt">Afficher le bandeau d'arrivée</div>
+          <div class="bbd">Bandeau en bas à gauche de l'écran OBS</div>
+          <div class="live-flag"><div class="ldot2"></div>Bandeau en direct</div>
+        </button>
+      </div>
+      <div class="bcast-block">
+        <button class="big-btn bbv-red" onclick="hideAll()">
+          <div class="bbt">Masquer tout l'overlay</div>
+          <div class="bbd">Retire classement et bandeau immédiatement</div>
+        </button>
+      </div>
+    </div>
+  </div>
+
+</div>
+</div><!-- /panel-classement -->
+
+<!-- ════════════════════════════════════════════
+  ONGLET 2 — EN COURSE
+════════════════════════════════════════════ -->
+<div class="tab-panel" id="panel-encours">
+<div class="two-col">
+
+  <!-- Col 1 : sélection équipe -->
+  <div class="col">
+    <div class="col-head">
+      <div class="col-head-title">Sélectionner une pirogue</div>
+      <div class="col-head-desc">Bandeau "en course" en bas d'écran</div>
+    </div>
+    <div class="col-body" id="coursePirogueList"><div class="empty">Aucune pirogue</div></div>
+  </div>
+
+  <!-- Col 2 : diffusion en course -->
+  <div class="col">
+    <div class="col-head">
+      <div class="col-head-title">Diffusion OBS</div>
+      <div class="col-head-desc">Bandeau pleine largeur en bas de l'écran</div>
+    </div>
+    <div class="bcast-inner">
+      <div class="bcast-block">
+        <div class="sec-lbl">Pirogue sélectionnée</div>
+        <div class="status-card">
+          <div class="status-line"><div class="s-dot" id="stDotCours"></div><span class="s-key">En cours</span><span class="s-val" id="stValCours">Aucune</span></div>
+        </div>
+      </div>
+      <div class="bcast-block">
+        <div class="sec-lbl">Afficher le bandeau</div>
+        <button class="big-btn bbv-teal" id="btnCours" onclick="showBandeauCours()">
+          <div class="bbt">Afficher le bandeau en course</div>
+          <div class="bbd">Présente la pirogue sélectionnée en bas de l'écran OBS</div>
+          <div class="live-flag"><div class="ldot2"></div>Bandeau en direct</div>
+        </button>
+        <button class="big-btn bbv-red" onclick="hideAll()" style="margin-top:8px">
+          <div class="bbt">Masquer</div>
+          <div class="bbd">Retire le bandeau de l'écran</div>
+        </button>
+      </div>
+    </div>
+  </div>
+
+</div>
+</div><!-- /panel-encours -->
+
+<!-- ════════════════════════════════════════════
+  ONGLET 3 — COMPOSITIONS
+════════════════════════════════════════════ -->
+<div class="tab-panel" id="panel-equipes">
+<div class="two-col" style="grid-template-columns:220px 1fr">
+
+  <!-- Col 1 : liste équipes -->
+  <div class="col">
+    <div class="col-head">
+      <div class="col-head-title">Équipes</div>
+      <div class="col-head-desc">Cliquez pour éditer</div>
+    </div>
+    <div class="col-body" id="equipesList"><div class="empty">Aucune équipe</div></div>
+  </div>
+
+  <!-- Col 2 : éditeur membres + diffusion -->
+  <div class="col" id="equipeEditor" style="display:none">
+    <div class="col-head">
+      <div class="col-head-title" id="equipeEditorTitle">—</div>
+      <div class="col-head-desc">Membres de l'équipe</div>
+    </div>
+    <div style="padding:10px 12px;border-bottom:1px solid var(--line);display:flex;gap:8px;flex-shrink:0;align-items:center">
+      <button class="btn btn-blue" onclick="addMember()">+ Ajouter un membre</button>
+      <div style="flex:1"></div>
+      <button class="big-btn bbv-purple" style="margin-bottom:0;padding:10px 14px" id="btnEquipe" onclick="showEquipe()">
+        <div class="bbt" style="font-size:13px">Afficher la fiche sur OBS</div>
+        <div class="live-flag"><div class="ldot2"></div>Fiche en direct</div>
+      </button>
+    </div>
+    <div class="col-body" id="membersList"><div class="empty">Aucun membre — cliquez "+ Ajouter"</div></div>
+  </div>
+  <div class="col" id="equipeEditorEmpty" style="align-items:center;justify-content:center">
+    <div class="empty" style="padding:40px 20px">Sélectionnez une équipe pour éditer sa composition</div>
+  </div>
+
+</div>
+</div><!-- /panel-equipes -->
+
+<!-- ════════════════════════════════════════════
+  ONGLET 4 — PARTENAIRES
+════════════════════════════════════════════ -->
+<div class="tab-panel" id="panel-partenaires">
+<div class="two-col" style="grid-template-columns:1fr 280px">
+
+  <!-- Col 1 : liste sponsors -->
+  <div class="col">
+    <div class="col-head">
+      <div class="col-head-title">Partenaires</div>
+      <div class="col-head-desc">Logos et descriptions chargés depuis votre PC</div>
+    </div>
+    <div style="padding:10px 12px;border-bottom:1px solid var(--line);flex-shrink:0">
+      <button class="btn btn-blue" onclick="addSponsor()">+ Ajouter un partenaire</button>
+    </div>
+    <div class="col-body" id="sponsorsList"><div class="empty">Aucun partenaire</div></div>
+  </div>
+
+  <!-- Col 2 : diffusion -->
+  <div class="col">
+    <div class="col-head">
+      <div class="col-head-title">Diffusion OBS</div>
+      <div class="col-head-desc">Sélectionnez puis diffusez</div>
+    </div>
+    <div class="bcast-inner">
+      <div class="bcast-block">
+        <div class="sec-lbl">Partenaire actif</div>
+        <div class="status-card">
+          <div class="status-line"><div class="s-dot" id="stDotSp"></div><span class="s-key">Affiché</span><span class="s-val" id="stValSp">Aucun</span></div>
+        </div>
+      </div>
+      <div class="bcast-block">
+        <div class="sec-lbl">Choisir le partenaire</div>
+        <select class="sel" id="selSponsor" style="width:100%;margin-bottom:8px"><option value="">Partenaire à afficher...</option></select>
+        <button class="big-btn bbv-purple" id="btnSp" onclick="showSponsor()">
+          <div class="bbt">Afficher le partenaire sur OBS</div>
+          <div class="bbd">Carte centrée avec logo et description</div>
+          <div class="live-flag"><div class="ldot2"></div>Partenaire en direct</div>
+        </button>
+        <button class="big-btn bbv-red" onclick="hideAll()" style="margin-top:8px">
+          <div class="bbt">Masquer</div>
+          <div class="bbd">Retire la carte de l'écran</div>
+        </button>
+      </div>
+    </div>
+  </div>
+
+</div>
+</div><!-- /panel-partenaires -->
+
+</div><!-- /content-area -->
+
+<!-- Hidden file input pour photos -->
+<input type="file" class="file-input" id="fileInput" accept="image/*"/>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ════════════════════════════════════════════════════
+//  WebSocket
+// ════════════════════════════════════════════════════
+const WS_URL = 'ws://localhost:8766';
+let ws;
+let teams=[], ranking=[], compositions={}, sponsors=[];
+let overlay={mode:'hidden',team:'',place:0,showAll:false,sponsor:''};
+let dragIdx=null;
+let currentTab='classement';
+let selectedEquipe=null;
+let fileCallback=null; // cb(base64) après sélection fichier
+
+function connect() {
+  ws = new WebSocket(WS_URL);
+  ws.onopen  = () => badge('ok','Connecté');
+  ws.onclose = () => { badge('err','Déconnecté'); setTimeout(connect,2000); };
+  ws.onerror = () => badge('err','Erreur');
+  ws.onmessage = e => {
+    const m=JSON.parse(e.data);
+    if (m.type==='full_state') {
+      teams=m.teams||[]; ranking=m.ranking||[];
+      compositions=m.compositions||{}; sponsors=m.sponsors||[];
+      overlay=m.overlay||{mode:'hidden'};
+      renderAll(); syncUI();
+    } else if (m.type==='saved') {
+      flashSave();
+    }
+  };
+}
+function send(o){ if(ws&&ws.readyState===WebSocket.OPEN) ws.send(JSON.stringify(o)); else toast('Non connecté'); }
+function badge(cls,txt){
+  const b=document.getElementById('wsBadge');
+  b.className='ws-badge '+cls;
+  b.querySelector('.wdot').className='wdot'+(cls==='ok'?' blink':'');
+  document.getElementById('wsLabel').textContent=txt;
+}
+
+// ════════════════════════════════════════════════════
+//  TABS
+// ════════════════════════════════════════════════════
+function switchTab(t) {
+  currentTab=t;
+  document.querySelectorAll('.tab').forEach(el=>el.classList.remove('active'));
+  document.querySelectorAll('.tab-panel').forEach(el=>el.classList.remove('active'));
+  document.getElementById('tab-'+t).classList.add('active');
+  document.getElementById('panel-'+t).classList.add('active');
+}
+
+// ════════════════════════════════════════════════════
+//  ÉQUIPES
+// ════════════════════════════════════════════════════
+document.getElementById('teamInput').addEventListener('keydown',e=>{ if(e.key==='Enter')addTeam(); });
+function addTeam(){
+  const i=document.getElementById('teamInput'), n=i.value.trim();
+  if(!n)return; i.value=''; send({type:'add_team',name:n});
+}
+function removeTeam(n){ if(!confirm('Supprimer "'+n+'" ?'))return; send({type:'remove_team',name:n}); }
+
+// ════════════════════════════════════════════════════
+//  CLASSEMENT
+// ════════════════════════════════════════════════════
+function addToRanking(){
+  const n=document.getElementById('addSel').value;
+  if(!n){toast('Choisissez une pirogue');return;}
+  send({type:'add_to_ranking',name:n});
+}
+function removeFromRanking(n){ send({type:'remove_from_ranking',name:n}); }
+function moveUp(i){
+  if(i===0)return; const r=[...ranking]; [r[i-1],r[i]]=[r[i],r[i-1]]; send({type:'set_ranking',ranking:r});
+}
+function moveDown(i){
+  if(i>=ranking.length-1)return; const r=[...ranking]; [r[i],r[i+1]]=[r[i+1],r[i]]; send({type:'set_ranking',ranking:r});
+}
+function onDragStart(e,i){ dragIdx=i; e.currentTarget.classList.add('dragging'); e.dataTransfer.effectAllowed='move'; }
+function onDragEnd(e){ e.currentTarget.classList.remove('dragging'); document.querySelectorAll('.rank-row').forEach(el=>el.classList.remove('drag-over')); }
+function onDragOver(e){ e.preventDefault(); const r=e.target.closest('.rank-row'); if(!r)return; document.querySelectorAll('.rank-row').forEach(el=>el.classList.remove('drag-over')); r.classList.add('drag-over'); }
+function onDrop(e){
+  e.preventDefault(); const r=e.target.closest('.rank-row'); if(!r||dragIdx===null)return;
+  const ti=parseInt(r.dataset.idx); if(ti===dragIdx){dragIdx=null;return;}
+  const arr=[...ranking]; const m=arr.splice(dragIdx,1)[0]; arr.splice(ti,0,m);
+  dragIdx=null; send({type:'set_ranking',ranking:arr});
+}
+
+// ════════════════════════════════════════════════════
+//  COMPOSITIONS
+// ════════════════════════════════════════════════════
+function selectEquipe(name) {
+  selectedEquipe=name;
+  document.getElementById('equipeEditor').style.display='flex';
+  document.getElementById('equipeEditorEmpty').style.display='none';
+  document.getElementById('equipeEditorTitle').textContent=name.toUpperCase();
+  renderMembers();
+  // Highlight
+  document.querySelectorAll('.equipe-item').forEach(el=>{
+    el.style.borderColor = el.dataset.name===name ? 'rgba(68,144,200,.5)' : 'rgba(45,110,168,.18)';
+    el.style.background  = el.dataset.name===name ? 'rgba(68,144,200,.08)' : 'rgba(255,255,255,.025)';
+  });
+}
+
+function addMember(){
+  if(!selectedEquipe)return;
+  const comp=compositions[selectedEquipe]||[];
+  comp.push({nom:'',prenom:'',age:'',pays:'',photo_b64:''});
+  compositions[selectedEquipe]=comp;
+  renderMembers();
+}
+
+function removeMember(i){
+  if(!selectedEquipe)return;
+  const comp=compositions[selectedEquipe]||[];
+  comp.splice(i,1);
+  compositions[selectedEquipe]=comp;
+  renderMembers();
+}
+
+function updateMemberField(i, field, value){
+  if(!selectedEquipe)return;
+  const comp=compositions[selectedEquipe]||[];
+  if(comp[i]) comp[i][field]=value;
+  compositions[selectedEquipe]=comp;
+}
+
+function saveComposition(){
+  if(!selectedEquipe)return;
+  send({type:'set_composition',team:selectedEquipe,members:compositions[selectedEquipe]||[]});
+  toast('Composition sauvegardée');
+}
+
+function pickPhoto(i){
+  fileCallback = (b64) => {
+    if(!selectedEquipe)return;
+    const comp=compositions[selectedEquipe]||[];
+    if(comp[i]) comp[i].photo_b64=b64;
+    compositions[selectedEquipe]=comp;
+    renderMembers();
+  };
+  document.getElementById('fileInput').click();
+}
+
+// ════════════════════════════════════════════════════
+//  SPONSORS
+// ════════════════════════════════════════════════════
+function addSponsor(){
+  sponsors.push({nom:'Nouveau partenaire',description:'',logo_b64:''});
+  renderSponsors(); saveSponsorsSilent();
+}
+
+function removeSponsor(i){
+  sponsors.splice(i,1);
+  renderSponsors(); saveSponsorsSilent();
+}
+
+function updateSponsor(i,field,value){
+  if(sponsors[i]) sponsors[i][field]=value;
+}
+
+function saveSponsorsSilent(){ send({type:'set_sponsors',sponsors}); }
+
+function pickLogo(i){
+  fileCallback = (b64) => {
+    if(sponsors[i]) sponsors[i].logo_b64=b64;
+    renderSponsors(); saveSponsorsSilent();
+  };
+  document.getElementById('fileInput').click();
+}
+
+// File input handler
+document.getElementById('fileInput').addEventListener('change', async function(){
+  const f=this.files[0]; if(!f||!fileCallback)return;
+  const reader=new FileReader();
+  reader.onload=e=>{ fileCallback(e.target.result); fileCallback=null; };
+  reader.readAsDataURL(f);
+  this.value='';
+});
+
+// ════════════════════════════════════════════════════
+//  DIFFUSION
+// ════════════════════════════════════════════════════
+function showClassement(){ send({type:'show_classement'}); toast('Classement → OBS'); }
+function showBanner(){
+  const team=document.getElementById('bnTeam').value;
+  const place=parseInt(document.getElementById('bnPlace').value);
+  if(!team){toast('Sélectionnez une pirogue');return;}
+  if(!place){toast('Sélectionnez une place');return;}
+  send({type:'show_banner',team,place});
+  toast('Bandeau : '+team);
+}
+function showBandeauCours(){
+  const el=document.getElementById('stValCours');
+  const team=el.dataset.selected||'';
+  if(!team){toast('Sélectionnez une pirogue en cours');return;}
+  send({type:'show_bandeau_course',team});
+  toast('Bandeau en course : '+team);
+}
+function showEquipe(){
+  if(!selectedEquipe){toast('Sélectionnez une équipe');return;}
+  saveComposition();
+  setTimeout(()=>{ send({type:'show_equipe',team:selectedEquipe}); toast('Fiche : '+selectedEquipe); },300);
+}
+function showSponsor(){
+  const sp=document.getElementById('selSponsor').value;
+  if(!sp){toast('Sélectionnez un partenaire');return;}
+  send({type:'show_sponsor',sponsor:sp});
+  toast('Partenaire : '+sp);
+}
+function hideAll(){ send({type:'hide'}); toast('Overlay masqué'); }
+
+function selectPirogueEnCours(name){
+  document.getElementById('stValCours').textContent=name;
+  document.getElementById('stValCours').dataset.selected=name;
+  document.querySelectorAll('.cours-item').forEach(el=>{
+    el.style.borderColor = el.dataset.name===name ? 'rgba(68,144,200,.5)' : 'rgba(45,110,168,.18)';
+    el.style.background  = el.dataset.name===name ? 'rgba(68,144,200,.08)' : 'rgba(255,255,255,.025)';
+  });
+}
+
+function syncUI(){
+  const ov=overlay;
+  // Reset
+  ['btnC','btnB','btnCours','btnEquipe','btnSp'].forEach(id=>{ const el=document.getElementById(id); if(el) el.classList.remove('live-on'); });
+  ['stDotC','stDotB','stDotCours','stDotSp'].forEach(id=>{ const el=document.getElementById(id); if(el) el.classList.remove('on'); });
+  ['stValC','stValB','stValSp'].forEach(id=>{ const el=document.getElementById(id); if(el) el.textContent='Masqué'; });
+
+  // Tab live dots
+  document.querySelectorAll('.tab').forEach(el=>el.classList.remove('live'));
+
+  if (ov.mode==='classement'&&ov.showAll) {
+    act('btnC','stDotC'); document.getElementById('stValC').textContent=ranking.length+' pirogues';
+    document.getElementById('tab-classement').classList.add('live');
+  } else if (ov.mode==='arrivee'&&ov.team) {
+    act('btnB','stDotB'); document.getElementById('stValB').textContent=ov.team+' — '+ov.place+(ov.place===1?'re':'e')+' pl.';
+    document.getElementById('tab-classement').classList.add('live');
+  } else if (ov.mode==='bandeau_course') {
+    act('btnCours','stDotCours'); document.getElementById('stValCours').textContent=ov.team||'—';
+    document.getElementById('tab-encours').classList.add('live');
+  } else if (ov.mode==='equipe') {
+    act('btnEquipe',null);
+  } else if (ov.mode==='partenaires') {
+    act('btnSp','stDotSp'); document.getElementById('stValSp').textContent=ov.sponsor||'—';
+    document.getElementById('tab-partenaires').classList.add('live');
+  }
+}
+function act(btnId, dotId){
+  const b=document.getElementById(btnId); if(b)b.classList.add('live-on');
+  const d=document.getElementById(dotId); if(d)d.classList.add('on');
+}
+
+// ════════════════════════════════════════════════════
+//  SAUVEGARDE
+// ════════════════════════════════════════════════════
+function manualSave(){ send({type:'save'}); }
+function flashSave(){
+  const btn=document.getElementById('saveBtn');
+  btn.textContent='Sauvegardé !';
+  btn.classList.add('saved');
+  setTimeout(()=>{ btn.textContent='Sauvegarder'; btn.classList.remove('saved'); },2000);
+}
+
+// ════════════════════════════════════════════════════
+//  RENDER
+// ════════════════════════════════════════════════════
+function esc(s){ return (s||'').replace(/'/g,"\\'"); }
+function nc(i){ return i===0?'n1':i===1?'n2':i===2?'n3':''; }
+
+function renderAll(){
+  renderTeamPool();
+  renderRankList();
+  renderCourseList();
+  renderEquipesList();
+  if(selectedEquipe) renderMembers();
+  renderSponsors();
+  renderBannerSelects();
+}
+
+function renderTeamPool(){
+  const el=document.getElementById('teamPool');
+  el.innerHTML=teams.length?teams.map(t=>{
+    const pos=ranking.indexOf(t), inR=pos>=0;
+    return `<div class="chip">
+      <div class="chip-pos ${inR?'ranked':''}">${inR?pos+1:'—'}</div>
+      <div class="chip-name">${t}</div>
+      ${inR?`<span class="chip-label">${pos+1}${pos===0?'re':'e'}</span>`:''}
+      <button class="icon-btn del" onclick="removeTeam('${esc(t)}')" title="Supprimer">✕</button>
+    </div>`;
+  }).join(''):'<div class="empty">Aucune pirogue enregistrée</div>';
+}
+
+function renderRankList(){
+  const el=document.getElementById('rankList');
+  // Rebuild add select
+  const as=document.getElementById('addSel');
+  as.innerHTML='<option value="">Choisir une pirogue à classer...</option>'
+    +teams.filter(t=>!ranking.includes(t)).map(t=>`<option value="${esc(t)}">${t}</option>`).join('');
+
+  el.innerHTML=ranking.length?ranking.map((t,i)=>`
+    <div class="rank-row" data-idx="${i}" draggable="true"
+         ondragstart="onDragStart(event,${i})" ondragend="onDragEnd(event)"
+         ondragover="onDragOver(event)" ondrop="onDrop(event)">
+      <div class="rr-num ${nc(i)}">${i+1}</div>
+      <div class="rr-handle">⋮⋮</div>
+      <div class="rr-name">${t}</div>
+      <div class="rr-arrows">
+        <button class="arr-btn" onclick="moveUp(${i})" ${i===0?'disabled':''}>▲</button>
+        <button class="arr-btn" onclick="moveDown(${i})" ${i===ranking.length-1?'disabled':''}>▼</button>
+      </div>
+      <button class="rr-del" onclick="removeFromRanking('${esc(t)}')" title="Retirer">✕</button>
+    </div>`).join(''):'<div class="empty">Aucune pirogue classée</div>';
+}
+
+function renderCourseList(){
+  const el=document.getElementById('coursePirogueList');
+  const sel=document.getElementById('stValCours').dataset.selected||'';
+  el.innerHTML=teams.length?teams.map(t=>`
+    <div class="chip cours-item" data-name="${esc(t)}" onclick="selectPirogueEnCours('${esc(t)}')"
+         style="cursor:pointer;${sel===t?'border-color:rgba(68,144,200,.5);background:rgba(68,144,200,.08);':''}">
+      <div class="chip-name">${t}</div>
+      <span style="font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:rgba(122,160,192,.35);">Sélectionner</span>
+    </div>`).join(''):'<div class="empty">Aucune pirogue</div>';
+}
+
+function renderEquipesList(){
+  const el=document.getElementById('equipesList');
+  el.innerHTML=teams.length?teams.map(t=>`
+    <div class="chip equipe-item" data-name="${esc(t)}" onclick="selectEquipe('${esc(t)}')"
+         style="cursor:pointer;${selectedEquipe===t?'border-color:rgba(68,144,200,.5);background:rgba(68,144,200,.08);':''}">
+      <div class="chip-name">${t}</div>
+      <span style="font-family:'Barlow Condensed',sans-serif;font-size:10px;color:rgba(122,160,192,.35);">${(compositions[t]||[]).length} membre(s)</span>
+    </div>`).join(''):'<div class="empty">Aucune équipe</div>';
+  if(selectedEquipe&&!teams.includes(selectedEquipe)) selectedEquipe=null;
+  if(!selectedEquipe){
+    document.getElementById('equipeEditor').style.display='none';
+    document.getElementById('equipeEditorEmpty').style.display='flex';
+  }
+}
+
+function renderMembers(){
+  if(!selectedEquipe)return;
+  const members=compositions[selectedEquipe]||[];
+  const el=document.getElementById('membersList');
+  el.innerHTML=members.length?members.map((m,i)=>`
+    <div class="member-card">
+      <div class="member-photo-area">
+        <div class="member-photo-preview" onclick="pickPhoto(${i})">
+          ${m.photo_b64
+            ? `<img src="${m.photo_b64}" alt="photo"/>`
+            : `<svg viewBox="0 0 24 24" fill="none" stroke="#4490c8" stroke-width="1.5"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>`}
+        </div>
+        <span class="photo-hint">Cliquer pour<br>changer la photo</span>
+      </div>
+      <div class="member-fields">
+        <input class="inp-sm" placeholder="Prénom" value="${esc(m.prenom||'')}" oninput="updateMemberField(${i},'prenom',this.value)"/>
+        <input class="inp-sm" placeholder="Nom" value="${esc(m.nom||'')}" oninput="updateMemberField(${i},'nom',this.value)"/>
+        <input class="inp-sm" placeholder="Âge" type="number" min="1" max="99" value="${m.age||''}" oninput="updateMemberField(${i},'age',this.value)"/>
+        <input class="inp-sm" placeholder="Pays" value="${esc(m.pays||'')}" oninput="updateMemberField(${i},'pays',this.value)"/>
+      </div>
+      <button class="icon-btn del member-remove" onclick="removeMember(${i})" title="Supprimer">✕</button>
+    </div>`).join('')+`
+    <div style="padding:8px 4px">
+      <button class="btn btn-blue" onclick="saveComposition()" style="width:100%">Enregistrer la composition</button>
+    </div>`:'<div class="empty">Aucun membre — cliquez "+ Ajouter un membre"</div>';
+}
+
+function renderSponsors(){
+  const el=document.getElementById('sponsorsList');
+  el.innerHTML=sponsors.length?sponsors.map((sp,i)=>`
+    <div class="sponsor-item">
+      <div class="sponsor-top">
+        <div class="sponsor-logo-thumb" onclick="pickLogo(${i})" title="Cliquer pour changer le logo">
+          ${sp.logo_b64 ? `<img src="${sp.logo_b64}" alt="logo"/>`
+            : `<svg viewBox="0 0 24 24" fill="none" stroke="#4490c8" stroke-width="1.5" width="22" height="22"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 10h18"/></svg>`}
+        </div>
+        <input class="sponsor-name-inp" placeholder="Nom du partenaire" value="${esc(sp.nom||'')}"
+               oninput="updateSponsor(${i},'nom',this.value)" onblur="saveSponsorsSilent()"/>
+        <button class="icon-btn del" onclick="removeSponsor(${i})" title="Supprimer">✕</button>
+      </div>
+      <textarea class="sponsor-desc-inp" placeholder="Description ou slogan (optionnel)"
+                oninput="updateSponsor(${i},'description',this.value)" onblur="saveSponsorsSilent()">${sp.description||''}</textarea>
+    </div>`).join(''):'<div class="empty">Aucun partenaire — cliquez "+ Ajouter"</div>';
+
+  // Sync select
+  const sel=document.getElementById('selSponsor');
+  const sv=sel.value;
+  sel.innerHTML='<option value="">Partenaire à afficher...</option>'
+    +sponsors.map(s=>`<option value="${esc(s.nom)}" ${sv===s.nom?'selected':''}>${s.nom}</option>`).join('');
+  if(sv) sel.value=sv;
+}
+
+function renderBannerSelects(){
+  const bt=document.getElementById('bnTeam'), bv=bt.value;
+  bt.innerHTML='<option value="">Pirogue...</option>'+teams.map(t=>`<option value="${esc(t)}" ${bv===t?'selected':''}>${t}</option>`).join('');
+  if(bv)bt.value=bv;
+  const bp=document.getElementById('bnPlace'), pv=bp.value;
+  const mx=Math.max(teams.length,20);
+  bp.innerHTML='<option value="">Place obtenue...</option>'+Array.from({length:mx},(_,i)=>i+1).map(p=>`<option value="${p}" ${pv==p?'selected':''}>${p}${p===1?'re':'e'} place</option>`).join('');
+  if(pv)bp.value=pv;
+}
+
+function copyObs(){ navigator.clipboard.writeText('http://localhost:8765/overlay').then(()=>toast('URL OBS copiée')); }
+
+function toast(msg){
+  const el=document.getElementById('toast');
+  el.textContent=msg; el.classList.add('show');
+  clearTimeout(el._t); el._t=setTimeout(()=>el.classList.remove('show'),2200);
+}
+
+connect();
+</script>
+</body>
+</html>
