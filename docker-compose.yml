@@ -1,0 +1,13 @@
+services:
+  vendee-vaa:
+    build:
+      context: "./vendee-vaa-server 3v"
+    ports:
+      - "8765:8765"
+      - "8766:8766"
+    volumes:
+      - ./data:/data
+    environment:
+      - DATA_DIR=/data
+      - NO_BROWSER=1
+    restart: unless-stopped

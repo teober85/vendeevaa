@@ -8,17 +8,18 @@ Overlay  → http://localhost:8765/overlay
 Dépendance : pip install websockets
 """
 
-import asyncio, json, threading, webbrowser, base64, mimetypes
+import asyncio, json, os, threading, webbrowser, base64, mimetypes
 from http.server import BaseHTTPRequestHandler, HTTPServer
 from pathlib import Path
 from websockets.server import serve
 import websockets
 
-HTTP_PORT = 8765
-WS_PORT   = 8766
-HOST      = "localhost"
+HTTP_PORT  = 8765
+WS_PORT    = 8766
+HOST       = os.environ.get("HOST", "0.0.0.0")
 SCRIPT_DIR = Path(__file__).parent
-SAVE_FILE  = SCRIPT_DIR / "data.json"
+DATA_DIR   = Path(os.environ.get("DATA_DIR", str(SCRIPT_DIR)))
+SAVE_FILE  = DATA_DIR / "data.json"
 
 # ─── État par défaut ──────────────────────────────────
 DEFAULT_STATE = {
@@ -249,7 +250,8 @@ async def main():
     print("=" * 54 + "\n")
 
     threading.Thread(target=run_http, daemon=True).start()
-    webbrowser.open(f"http://{HOST}:{HTTP_PORT}")
+    if not os.environ.get("NO_BROWSER"):
+        webbrowser.open(f"http://localhost:{HTTP_PORT}")
 
     async with serve(ws_handler, HOST, WS_PORT):
         await asyncio.Future()
