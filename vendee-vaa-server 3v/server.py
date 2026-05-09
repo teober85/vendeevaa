@@ -25,14 +25,12 @@ DEFAULT_STATE = {
     "teams":    [],   # [str] noms des pirogues inscrites
     "ranking":  [],   # [str] noms ordonnés (index 0 = 1re place)
     "overlay": {
-        "mode":    "hidden",   # hidden|classement|arrivee|bandeau_course|equipe|partenaires
+        "mode":    "hidden",   # hidden|classement|arrivee|bandeau_course|partenaires
         "team":    "",
         "place":   0,
         "showAll": False,
         "sponsor": "",         # nom du partenaire actif (optionnel)
     },
-    # Compositions : { "NomEquipe": [{ nom, prenom, age, pays, photo_b64 }, ...] }
-    "compositions": {},
     # Partenaires : [{ nom, logo_b64, description }]
     "sponsors": [],
 }
@@ -98,15 +96,12 @@ async def ws_handler(websocket):
                 name = msg.get("name", "").strip()
                 if name and name not in state["teams"] and len(state["teams"]) < 60:
                     state["teams"].append(name)
-                    if name not in state["compositions"]:
-                        state["compositions"][name] = []
                     await broadcast_state()
 
             elif t == "remove_team":
                 name = msg.get("name", "")
                 state["teams"] = [x for x in state["teams"] if x != name]
                 state["ranking"] = [x for x in state["ranking"] if x != name]
-                state["compositions"].pop(name, None)
                 if state["overlay"].get("team") == name:
                     state["overlay"]["mode"] = "hidden"
                     state["overlay"]["team"] = ""
@@ -119,8 +114,6 @@ async def ws_handler(websocket):
                     idx = state["teams"].index(old)
                     state["teams"][idx] = new
                     state["ranking"] = [new if x == old else x for x in state["ranking"]]
-                    comp = state["compositions"].pop(old, [])
-                    state["compositions"][new] = comp
                     if state["overlay"].get("team") == old:
                         state["overlay"]["team"] = new
                     await broadcast_state()
@@ -160,11 +153,6 @@ async def ws_handler(websocket):
                 state["overlay"] = {"mode": "bandeau_course", "team": team, "place": 0, "showAll": False, "sponsor": ""}
                 await broadcast_state()
 
-            elif t == "show_equipe":
-                team = msg.get("team", "")
-                state["overlay"] = {"mode": "equipe", "team": team, "place": 0, "showAll": False, "sponsor": ""}
-                await broadcast_state()
-
             elif t == "show_sponsor":
                 sponsor = msg.get("sponsor", "")
                 state["overlay"] = {"mode": "partenaires", "team": "", "place": 0, "showAll": False, "sponsor": sponsor}
@@ -174,14 +162,6 @@ async def ws_handler(websocket):
                 state["overlay"]["mode"] = "hidden"
                 state["overlay"]["showAll"] = False
                 await broadcast_state()
-
-            # ── Compositions ─────────────────────────
-            elif t == "set_composition":
-                team = msg.get("team", "")
-                members = msg.get("members", [])
-                if team in state["teams"]:
-                    state["compositions"][team] = members
-                    await broadcast_state()
 
             # ── Sponsors ─────────────────────────────
             elif t == "set_sponsors":

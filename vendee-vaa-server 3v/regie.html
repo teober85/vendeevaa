@@ -160,21 +160,6 @@ body { background:var(--deep); color:var(--white); font-family:'Barlow',sans-ser
 .bcast-inner { flex:1; overflow-y:auto; }
 .bcast-inner::-webkit-scrollbar{width:3px;} .bcast-inner::-webkit-scrollbar-thumb{background:rgba(45,110,168,.3);border-radius:2px;}
 
-/* ─ MEMBERS EDITOR ─ */
-.member-card { background:rgba(255,255,255,.03); border:1px solid var(--line); border-radius:7px; padding:12px; display:flex; gap:12px; align-items:flex-start; animation:fi .2s ease; }
-.member-photo-area { flex-shrink:0; display:flex; flex-direction:column; align-items:center; gap:6px; }
-.member-photo-preview { width:64px; height:64px; border-radius:50%; object-fit:cover; border:2px solid rgba(45,110,168,.3); background:rgba(45,110,168,.12); display:flex; align-items:center; justify-content:center; cursor:pointer; overflow:hidden; transition:border-color .2s; }
-.member-photo-preview:hover { border-color:var(--blue3); }
-.member-photo-preview img { width:100%; height:100%; object-fit:cover; }
-.member-photo-preview svg { width:28px; height:28px; opacity:.3; }
-.photo-hint { font-family:'Barlow Condensed',sans-serif; font-size:9px; font-weight:700; letter-spacing:1px; text-transform:uppercase; color:rgba(122,160,192,.3); text-align:center; }
-.member-fields { flex:1; display:grid; grid-template-columns:1fr 1fr; gap:6px; }
-.member-fields .inp-sm { background:rgba(255,255,255,.04); border:1px solid var(--line); border-radius:4px; padding:7px 10px; color:var(--white); font-family:'Barlow',sans-serif; font-size:12px; outline:none; transition:border-color .2s; width:100%; }
-.member-fields .inp-sm:focus { border-color:var(--blue); }
-.member-fields .inp-sm::placeholder { color:rgba(122,160,192,.25); }
-.member-remove { align-self:flex-start; }
-.file-input { display:none; }
-
 /* ─ SPONSOR CARD ─ */
 .sponsor-item { display:flex; flex-direction:column; background:rgba(255,255,255,.025); border:1px solid var(--line); border-radius:7px; overflow:hidden; animation:fi .2s ease; }
 .sponsor-top { display:flex; align-items:center; gap:10px; padding:10px 12px; border-bottom:1px solid var(--line); }
@@ -237,9 +222,6 @@ body { background:var(--deep); color:var(--white); font-family:'Barlow',sans-ser
   </div>
   <div class="tab" onclick="switchTab('encours')" id="tab-encours">
     <div class="tab-dot"></div>En course
-  </div>
-  <div class="tab" onclick="switchTab('equipes')" id="tab-equipes">
-    Compositions
   </div>
   <div class="tab" onclick="switchTab('partenaires')" id="tab-partenaires">
     Partenaires
@@ -374,45 +356,7 @@ body { background:var(--deep); color:var(--white); font-family:'Barlow',sans-ser
 </div><!-- /panel-encours -->
 
 <!-- ════════════════════════════════════════════
-  ONGLET 3 — COMPOSITIONS
-════════════════════════════════════════════ -->
-<div class="tab-panel" id="panel-equipes">
-<div class="two-col" style="grid-template-columns:220px 1fr">
-
-  <!-- Col 1 : liste équipes -->
-  <div class="col">
-    <div class="col-head">
-      <div class="col-head-title">Équipes</div>
-      <div class="col-head-desc">Cliquez pour éditer</div>
-    </div>
-    <div class="col-body" id="equipesList"><div class="empty">Aucune équipe</div></div>
-  </div>
-
-  <!-- Col 2 : éditeur membres + diffusion -->
-  <div class="col" id="equipeEditor" style="display:none">
-    <div class="col-head">
-      <div class="col-head-title" id="equipeEditorTitle">—</div>
-      <div class="col-head-desc">Membres de l'équipe</div>
-    </div>
-    <div style="padding:10px 12px;border-bottom:1px solid var(--line);display:flex;gap:8px;flex-shrink:0;align-items:center">
-      <button class="btn btn-blue" onclick="addMember()">+ Ajouter un membre</button>
-      <div style="flex:1"></div>
-      <button class="big-btn bbv-purple" style="margin-bottom:0;padding:10px 14px" id="btnEquipe" onclick="showEquipe()">
-        <div class="bbt" style="font-size:13px">Afficher la fiche sur OBS</div>
-        <div class="live-flag"><div class="ldot2"></div>Fiche en direct</div>
-      </button>
-    </div>
-    <div class="col-body" id="membersList"><div class="empty">Aucun membre — cliquez "+ Ajouter"</div></div>
-  </div>
-  <div class="col" id="equipeEditorEmpty" style="align-items:center;justify-content:center">
-    <div class="empty" style="padding:40px 20px">Sélectionnez une équipe pour éditer sa composition</div>
-  </div>
-
-</div>
-</div><!-- /panel-equipes -->
-
-<!-- ════════════════════════════════════════════
-  ONGLET 4 — PARTENAIRES
+  ONGLET 3 — PARTENAIRES
 ════════════════════════════════════════════ -->
 <div class="tab-panel" id="panel-partenaires">
 <div class="two-col" style="grid-template-columns:1fr 280px">
@@ -464,7 +408,7 @@ body { background:var(--deep); color:var(--white); font-family:'Barlow',sans-ser
 </div><!-- /content-area -->
 
 <!-- Hidden file input pour photos -->
-<input type="file" class="file-input" id="fileInput" accept="image/*"/>
+<input type="file" id="fileInput" accept="image/*" style="display:none"/>
 
 <div class="toast" id="toast"></div>
 
@@ -474,12 +418,11 @@ body { background:var(--deep); color:var(--white); font-family:'Barlow',sans-ser
 // ════════════════════════════════════════════════════
 const WS_URL = 'ws://localhost:8766';
 let ws;
-let teams=[], ranking=[], compositions={}, sponsors=[];
+let teams=[], ranking=[], sponsors=[];
 let overlay={mode:'hidden',team:'',place:0,showAll:false,sponsor:''};
 let dragIdx=null;
 let currentTab='classement';
-let selectedEquipe=null;
-let fileCallback=null; // cb(base64) après sélection fichier
+let fileCallback=null;
 
 function connect() {
   ws = new WebSocket(WS_URL);
@@ -490,7 +433,7 @@ function connect() {
     const m=JSON.parse(e.data);
     if (m.type==='full_state') {
       teams=m.teams||[]; ranking=m.ranking||[];
-      compositions=m.compositions||{}; sponsors=m.sponsors||[];
+      sponsors=m.sponsors||[];
       overlay=m.overlay||{mode:'hidden'};
       renderAll(); syncUI();
     } else if (m.type==='saved') {
@@ -553,62 +496,6 @@ function onDrop(e){
 }
 
 // ════════════════════════════════════════════════════
-//  COMPOSITIONS
-// ════════════════════════════════════════════════════
-function selectEquipe(name) {
-  selectedEquipe=name;
-  document.getElementById('equipeEditor').style.display='flex';
-  document.getElementById('equipeEditorEmpty').style.display='none';
-  document.getElementById('equipeEditorTitle').textContent=name.toUpperCase();
-  renderMembers();
-  // Highlight
-  document.querySelectorAll('.equipe-item').forEach(el=>{
-    el.style.borderColor = el.dataset.name===name ? 'rgba(68,144,200,.5)' : 'rgba(45,110,168,.18)';
-    el.style.background  = el.dataset.name===name ? 'rgba(68,144,200,.08)' : 'rgba(255,255,255,.025)';
-  });
-}
-
-function addMember(){
-  if(!selectedEquipe)return;
-  const comp=compositions[selectedEquipe]||[];
-  comp.push({nom:'',prenom:'',age:'',pays:'',photo_b64:''});
-  compositions[selectedEquipe]=comp;
-  renderMembers();
-}
-
-function removeMember(i){
-  if(!selectedEquipe)return;
-  const comp=compositions[selectedEquipe]||[];
-  comp.splice(i,1);
-  compositions[selectedEquipe]=comp;
-  renderMembers();
-}
-
-function updateMemberField(i, field, value){
-  if(!selectedEquipe)return;
-  const comp=compositions[selectedEquipe]||[];
-  if(comp[i]) comp[i][field]=value;
-  compositions[selectedEquipe]=comp;
-}
-
-function saveComposition(){
-  if(!selectedEquipe)return;
-  send({type:'set_composition',team:selectedEquipe,members:compositions[selectedEquipe]||[]});
-  toast('Composition sauvegardée');
-}
-
-function pickPhoto(i){
-  fileCallback = (b64) => {
-    if(!selectedEquipe)return;
-    const comp=compositions[selectedEquipe]||[];
-    if(comp[i]) comp[i].photo_b64=b64;
-    compositions[selectedEquipe]=comp;
-    renderMembers();
-  };
-  document.getElementById('fileInput').click();
-}
-
-// ════════════════════════════════════════════════════
 //  SPONSORS
 // ════════════════════════════════════════════════════
 function addSponsor(){
@@ -663,11 +550,6 @@ function showBandeauCours(){
   send({type:'show_bandeau_course',team});
   toast('Bandeau en course : '+team);
 }
-function showEquipe(){
-  if(!selectedEquipe){toast('Sélectionnez une équipe');return;}
-  saveComposition();
-  setTimeout(()=>{ send({type:'show_equipe',team:selectedEquipe}); toast('Fiche : '+selectedEquipe); },300);
-}
 function showSponsor(){
   const sp=document.getElementById('selSponsor').value;
   if(!sp){toast('Sélectionnez un partenaire');return;}
@@ -688,7 +570,7 @@ function selectPirogueEnCours(name){
 function syncUI(){
   const ov=overlay;
   // Reset
-  ['btnC','btnB','btnCours','btnEquipe','btnSp'].forEach(id=>{ const el=document.getElementById(id); if(el) el.classList.remove('live-on'); });
+  ['btnC','btnB','btnCours','btnSp'].forEach(id=>{ const el=document.getElementById(id); if(el) el.classList.remove('live-on'); });
   ['stDotC','stDotB','stDotCours','stDotSp'].forEach(id=>{ const el=document.getElementById(id); if(el) el.classList.remove('on'); });
   ['stValC','stValB','stValSp'].forEach(id=>{ const el=document.getElementById(id); if(el) el.textContent='Masqué'; });
 
@@ -704,8 +586,6 @@ function syncUI(){
   } else if (ov.mode==='bandeau_course') {
     act('btnCours','stDotCours'); document.getElementById('stValCours').textContent=ov.team||'—';
     document.getElementById('tab-encours').classList.add('live');
-  } else if (ov.mode==='equipe') {
-    act('btnEquipe',null);
   } else if (ov.mode==='partenaires') {
     act('btnSp','stDotSp'); document.getElementById('stValSp').textContent=ov.sponsor||'—';
     document.getElementById('tab-partenaires').classList.add('live');
@@ -737,8 +617,6 @@ function renderAll(){
   renderTeamPool();
   renderRankList();
   renderCourseList();
-  renderEquipesList();
-  if(selectedEquipe) renderMembers();
   renderSponsors();
   renderBannerSelects();
 }
@@ -787,48 +665,6 @@ function renderCourseList(){
       <div class="chip-name">${t}</div>
       <span style="font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:rgba(122,160,192,.35);">Sélectionner</span>
     </div>`).join(''):'<div class="empty">Aucune pirogue</div>';
-}
-
-function renderEquipesList(){
-  const el=document.getElementById('equipesList');
-  el.innerHTML=teams.length?teams.map(t=>`
-    <div class="chip equipe-item" data-name="${esc(t)}" onclick="selectEquipe('${esc(t)}')"
-         style="cursor:pointer;${selectedEquipe===t?'border-color:rgba(68,144,200,.5);background:rgba(68,144,200,.08);':''}">
-      <div class="chip-name">${t}</div>
-      <span style="font-family:'Barlow Condensed',sans-serif;font-size:10px;color:rgba(122,160,192,.35);">${(compositions[t]||[]).length} membre(s)</span>
-    </div>`).join(''):'<div class="empty">Aucune équipe</div>';
-  if(selectedEquipe&&!teams.includes(selectedEquipe)) selectedEquipe=null;
-  if(!selectedEquipe){
-    document.getElementById('equipeEditor').style.display='none';
-    document.getElementById('equipeEditorEmpty').style.display='flex';
-  }
-}
-
-function renderMembers(){
-  if(!selectedEquipe)return;
-  const members=compositions[selectedEquipe]||[];
-  const el=document.getElementById('membersList');
-  el.innerHTML=members.length?members.map((m,i)=>`
-    <div class="member-card">
-      <div class="member-photo-area">
-        <div class="member-photo-preview" onclick="pickPhoto(${i})">
-          ${m.photo_b64
-            ? `<img src="${m.photo_b64}" alt="photo"/>`
-            : `<svg viewBox="0 0 24 24" fill="none" stroke="#4490c8" stroke-width="1.5"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>`}
-        </div>
-        <span class="photo-hint">Cliquer pour<br>changer la photo</span>
-      </div>
-      <div class="member-fields">
-        <input class="inp-sm" placeholder="Prénom" value="${esc(m.prenom||'')}" oninput="updateMemberField(${i},'prenom',this.value)"/>
-        <input class="inp-sm" placeholder="Nom" value="${esc(m.nom||'')}" oninput="updateMemberField(${i},'nom',this.value)"/>
-        <input class="inp-sm" placeholder="Âge" type="number" min="1" max="99" value="${m.age||''}" oninput="updateMemberField(${i},'age',this.value)"/>
-        <input class="inp-sm" placeholder="Pays" value="${esc(m.pays||'')}" oninput="updateMemberField(${i},'pays',this.value)"/>
-      </div>
-      <button class="icon-btn del member-remove" onclick="removeMember(${i})" title="Supprimer">✕</button>
-    </div>`).join('')+`
-    <div style="padding:8px 4px">
-      <button class="btn btn-blue" onclick="saveComposition()" style="width:100%">Enregistrer la composition</button>
-    </div>`:'<div class="empty">Aucun membre — cliquez "+ Ajouter un membre"</div>';
 }
 
 function renderSponsors(){
