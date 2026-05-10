@@ -618,7 +618,10 @@ function renderTeamPool(){
              onchange="setTeamNumber('${esc(t)}',this.value)"
              onkeydown="if(event.key==='Enter')this.blur()"
              onclick="event.stopPropagation()">
-      <div class="chip-name">${t}</div>
+      <input class="chip-name-inp" value="${esc(t)}" maxlength="40"
+             onchange="renameTeam('${esc(t)}',this)"
+             onkeydown="if(event.key==='Enter')this.blur()"
+             onclick="event.stopPropagation()">
       ${inR
         ? `<button class="icon-btn" onclick="removeFromRanking('${esc(t)}')" title="Retirer du classement" style="color:rgba(232,64,64,.5);font-size:15px">↩</button>`
         : `<button class="icon-btn action" onclick="addToRankingDirect('${esc(t)}')" title="Classer" style="font-size:17px;font-weight:900;line-height:1">+</button>`}
@@ -629,6 +632,11 @@ function renderTeamPool(){
 
 function setTeamNumber(name, val){
   send({type:'set_team_number', race:currentRace, name, number:val.trim()});
+}
+function renameTeam(oldName, input){
+  const newName=input.value.trim();
+  if(!newName||newName===oldName){input.value=oldName;return;}
+  send({type:'rename_team',race:currentRace,old:oldName,new:newName});
 }
 
 function addToRankingDirect(name){

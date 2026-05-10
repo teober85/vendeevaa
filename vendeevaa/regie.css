@@ -93,6 +93,8 @@ body { background:var(--deep); color:var(--white); font-family:'Barlow',sans-ser
 .chip-num-inp::placeholder { color:rgba(122,160,192,.22); }
 .chip-num-inp:focus { border-color:var(--blue3); background:rgba(45,110,168,.15); }
 .chip-name { flex:1; font-family:'Barlow Condensed',sans-serif; font-size:16px; font-weight:700; letter-spacing:.3px; text-transform:uppercase; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.chip-name-inp { flex:1; min-width:0; background:transparent; border:none; border-radius:3px; font-family:'Barlow Condensed',sans-serif; font-size:16px; font-weight:700; letter-spacing:.3px; text-transform:uppercase; color:rgba(255,255,255,.82); outline:none; padding:0 3px; cursor:pointer; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; transition:background .12s, color .12s; }
+.chip-name-inp:focus { background:rgba(45,110,168,.15); color:#fff; cursor:text; }
 .chip-label { font-family:'Barlow Condensed',sans-serif; font-size:12px; font-weight:700; letter-spacing:1px; text-transform:uppercase; color:rgba(68,144,200,.45); white-space:nowrap; }
 .icon-btn { background:transparent; border:none; cursor:pointer; border-radius:3px; width:26px; height:26px; display:flex; align-items:center; justify-content:center; font-size:13px; transition:all .12s; flex-shrink:0; }
 .icon-btn.del { color:rgba(232,64,64,.3); }
