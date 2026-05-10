@@ -73,7 +73,9 @@ def load_state():
 
 def save_state(state):
     try:
-        SAVE_FILE.write_text(json.dumps(state, ensure_ascii=False, indent=2), encoding="utf-8")
+        tmp = SAVE_FILE.with_suffix(".tmp")
+        tmp.write_text(json.dumps(state, ensure_ascii=False, indent=2), encoding="utf-8")
+        tmp.replace(SAVE_FILE)  # atomique sur Linux/Windows
     except Exception as e:
         print(f"  Erreur sauvegarde : {e}")
 
@@ -288,7 +290,13 @@ async def main():
     if not os.environ.get("NO_BROWSER"):
         webbrowser.open(f"http://localhost:{HTTP_PORT}")
 
+    async def auto_save():
+        while True:
+            await asyncio.sleep(30)
+            save_state(state)
+
     async with serve(ws_handler, HOST, WS_PORT):
+        asyncio.create_task(auto_save())
         await asyncio.Future()
 
 if __name__ == "__main__":
