@@ -25,6 +25,7 @@
   <div class="tb-right">
     <button class="save-btn" onclick="copyObs()">URL Overlay</button>
     <button class="save-btn" id="saveBtn" onclick="manualSave()">Sauvegarder</button>
+    <button class="save-btn" onclick="toggleShortcuts()" title="Raccourcis clavier">⌨ Aide</button>
     <div class="ws-badge" id="wsBadge"><div class="wdot blink"></div><span id="wsLabel">Connexion...</span></div>
   </div>
 </div>
@@ -305,6 +306,33 @@
 </div>
 
 <div class="toast" id="toast"></div>
+
+<!-- MODAL SHORTCUTS -->
+<div class="sc-modal" id="shortcutsModal" onclick="closeShortcuts(event)">
+  <div class="sc-box">
+    <div class="sc-head">
+      <span>Raccourcis clavier</span>
+      <button class="sc-close" onclick="closeShortcuts()">✕</button>
+    </div>
+    <div class="sc-body">
+      <div class="sc-group">Diffusion</div>
+      <div class="sc-row"><div class="sc-keys"><kbd>C</kbd></div><span>Afficher le classement</span></div>
+      <div class="sc-row"><div class="sc-keys"><kbd>A</kbd></div><span>Bandeau arrivée (pirogue sélectionnée)</span></div>
+      <div class="sc-row"><div class="sc-keys"><kbd>E</kbd></div><span>Bandeau en cours (pirogue sélectionnée)</span></div>
+      <div class="sc-row"><div class="sc-keys"><kbd>P</kbd></div><span>Diffuser le partenaire sélectionné</span></div>
+      <div class="sc-row"><div class="sc-keys"><kbd>Suppr</kbd></div><span>Masquer l'overlay</span></div>
+      <div class="sc-row"><div class="sc-keys"><kbd>Échap</kbd></div><span>Masquer l'overlay / fermer</span></div>
+      <div class="sc-group">Navigation courses</div>
+      <div class="sc-row"><div class="sc-keys"><kbd>1</kbd></div><span>Course Medium</span></div>
+      <div class="sc-row"><div class="sc-keys"><kbd>2</kbd></div><span>Course Large</span></div>
+      <div class="sc-row"><div class="sc-keys"><kbd>3</kbd></div><span>Course Sélectif</span></div>
+      <div class="sc-row"><div class="sc-keys"><kbd>←</kbd><kbd>→</kbd></div><span>Course précédente / suivante</span></div>
+      <div class="sc-group">Interface</div>
+      <div class="sc-row"><div class="sc-keys"><kbd>S</kbd></div><span>Ouvrir / fermer les réglages</span></div>
+      <div class="sc-row"><div class="sc-keys"><kbd>?</kbd></div><span>Cette aide</span></div>
+    </div>
+  </div>
+</div>
 
 <script>
 // ════════════════════════════════════════════════════
@@ -751,7 +779,67 @@ function previewFullscreen(btn){
   if(!document.fullscreenElement){ wrap.requestFullscreen().catch(()=>{}); }
   else { document.exitFullscreen(); }
 }
-document.addEventListener('keydown',e=>{ if(e.key==='Escape') closePreviewModal(); });
+function toggleShortcuts(){ document.getElementById('shortcutsModal').classList.toggle('open'); }
+function closeShortcuts(e){
+  if(!e || e.target===document.getElementById('shortcutsModal'))
+    document.getElementById('shortcutsModal').classList.remove('open');
+}
+
+const RACE_ORDER = ['medium','large','selectif'];
+document.addEventListener('keydown', e => {
+  // Ne pas intercepter quand on saisit dans un champ
+  if (e.target.tagName==='INPUT' || e.target.tagName==='TEXTAREA' || e.target.tagName==='SELECT') return;
+  if (e.metaKey || e.ctrlKey || e.altKey) return;
+
+  const sc = document.getElementById('shortcutsModal');
+  const pm = document.getElementById('previewModal');
+
+  switch(e.key) {
+    case 'Escape':
+      e.preventDefault();
+      if (sc.classList.contains('open')) { sc.classList.remove('open'); }
+      else if (pm.classList.contains('open')) { pm.classList.remove('open'); }
+      else { hideAll(); }
+      break;
+    case 'Delete':
+    case 'Backspace':
+      e.preventDefault();
+      hideAll();
+      break;
+    case 'c': case 'C':
+      e.preventDefault(); showClassement(); break;
+    case 'a': case 'A':
+      e.preventDefault(); showBanner(); break;
+    case 'e': case 'E':
+      e.preventDefault(); showBandeauCours(); break;
+    case 'p': case 'P':
+      e.preventDefault(); showSponsor(); break;
+    case '1':
+      e.preventDefault(); switchRace('medium'); break;
+    case '2':
+      e.preventDefault(); switchRace('large'); break;
+    case '3':
+      e.preventDefault(); switchRace('selectif'); break;
+    case 'ArrowLeft': {
+      e.preventDefault();
+      const i = RACE_ORDER.indexOf(currentRace);
+      if (i > 0) switchRace(RACE_ORDER[i-1]);
+      break;
+    }
+    case 'ArrowRight': {
+      e.preventDefault();
+      const i = RACE_ORDER.indexOf(currentRace);
+      if (i < RACE_ORDER.length-1) switchRace(RACE_ORDER[i+1]);
+      break;
+    }
+    case 's': case 'S':
+      e.preventDefault();
+      if (currentTab==='classement') toggleSettings();
+      break;
+    case '?':
+      e.preventDefault(); toggleShortcuts(); break;
+  }
+});
 
 function toast(msg){
   const el=document.getElementById('toast');

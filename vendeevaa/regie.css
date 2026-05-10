@@ -245,6 +245,21 @@ body { background:var(--deep); color:var(--white); font-family:'Barlow',sans-ser
 .cp-rgb-lbl { display:flex; flex-direction:column; gap:4px; font-family:'Barlow Condensed',sans-serif; font-size:10px; font-weight:800; letter-spacing:2px; text-transform:uppercase; color:var(--mist); }
 .cp-num { width:68px; padding:8px; text-align:center; font-size:14px; }
 
+/* ─ SHORTCUTS MODAL ─ */
+.sc-modal { position:fixed; inset:0; background:rgba(0,0,0,.75); z-index:9100; display:none; align-items:center; justify-content:center; }
+.sc-modal.open { display:flex; }
+.sc-box { background:#0b1826; border:1px solid rgba(45,110,168,.35); border-radius:10px; width:420px; max-width:94vw; overflow:hidden; box-shadow:0 24px 80px rgba(0,0,0,.65); }
+.sc-head { display:flex; align-items:center; justify-content:space-between; padding:14px 18px; border-bottom:1px solid rgba(45,110,168,.18); background:rgba(45,110,168,.06); font-family:'Barlow Condensed',sans-serif; font-size:13px; font-weight:800; letter-spacing:3px; text-transform:uppercase; color:var(--mist); }
+.sc-close { background:transparent; border:none; color:rgba(122,160,192,.4); font-size:15px; cursor:pointer; width:26px; height:26px; display:flex; align-items:center; justify-content:center; border-radius:3px; transition:all .12s; }
+.sc-close:hover { background:rgba(232,64,64,.15); color:var(--red); }
+.sc-body { padding:12px 18px 18px; display:flex; flex-direction:column; gap:3px; max-height:70vh; overflow-y:auto; }
+.sc-group { font-family:'Barlow Condensed',sans-serif; font-size:10px; font-weight:800; letter-spacing:3px; text-transform:uppercase; color:rgba(68,144,200,.5); margin-top:12px; margin-bottom:4px; padding-bottom:5px; border-bottom:1px solid var(--line); }
+.sc-group:first-child { margin-top:4px; }
+.sc-row { display:flex; align-items:center; gap:14px; padding:5px 0; }
+.sc-keys { display:flex; gap:4px; flex-shrink:0; min-width:80px; }
+.sc-row span { font-family:'Barlow',sans-serif; font-size:13px; color:rgba(200,220,240,.65); }
+kbd { display:inline-flex; align-items:center; justify-content:center; min-width:28px; height:24px; padding:0 7px; background:rgba(255,255,255,.06); border:1px solid rgba(122,160,192,.25); border-bottom-width:2px; border-radius:4px; font-family:'Barlow Condensed',sans-serif; font-size:12px; font-weight:700; color:var(--mist); letter-spacing:.3px; }
+
 /* ─ SPLIT HANDLE ─ */
 .split-handle {
   width:8px; flex-shrink:0; position:relative;
