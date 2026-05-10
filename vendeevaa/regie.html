@@ -98,10 +98,10 @@
 </div>
 
 <!-- Vue live : classement + diffusion -->
-<div style="display:flex;flex:1;overflow:hidden">
+<div style="display:flex;flex:1;overflow:hidden" id="splitPane">
 
   <!-- Classement -->
-  <div class="col" style="flex:1">
+  <div class="col" id="splitLeft" style="flex:0 0 480px;min-width:180px">
     <div class="col-head">
       <div style="display:flex;align-items:center;gap:10px">
         <div style="flex:1">
@@ -121,47 +121,37 @@
     </div>
   </div>
 
+  <!-- Séparateur redimensionnable -->
+  <div class="split-handle" id="splitHandle"><div class="split-grip"></div></div>
+
   <!-- Diffusion -->
-  <div class="col" style="width:300px;flex-shrink:0">
+  <div class="col ob-col" id="splitRight">
     <div class="preview-wrap">
       <div class="preview-label">Aperçu live</div>
       <iframe src="/overlay" class="preview-iframe" scrolling="no"></iframe>
       <div class="preview-btns">
-        <button class="preview-btn" onclick="previewPopout()" title="Ouvrir dans une fenêtre">⤢</button>
+        <button class="preview-btn" onclick="previewPopout()" title="Agrandir">⤢</button>
         <button class="preview-btn" onclick="previewFullscreen(this)" title="Plein écran">⛶</button>
       </div>
     </div>
-    <div class="bcast-inner">
-      <div class="bcast-block">
-        <div class="sec-lbl">Statut actuel</div>
-        <div class="status-card">
-          <div class="status-line"><div class="s-dot" id="stDotC"></div><span class="s-key">Classement</span><span class="s-val" id="stValC">Masqué</span></div>
-          <div class="status-line"><div class="s-dot" id="stDotB"></div><span class="s-key">Bandeau arrivée</span><span class="s-val" id="stValB">Masqué</span></div>
+    <div class="ob-panel">
+      <div class="ob-status">
+        <div class="ob-dot" id="stDotC"></div>
+        <span class="ob-status-txt" id="stValC">Masqué</span>
+      </div>
+      <div class="ob-action">
+        <button class="ob-btn ob-blue" id="btnC" onclick="showClassement()">Classement</button>
+      </div>
+      <div class="ob-action">
+        <div class="ob-arrival-row">
+          <select class="sel" id="bnTeam"><option value="">Pirogue...</option></select>
+          <input type="number" class="ob-place-inp" id="bnPlace" min="1" value="1"
+                 title="Place (préselection auto, modifiable)">
         </div>
+        <button class="ob-btn ob-green" id="btnB" onclick="showBanner()" style="margin-top:8px">Arrivée</button>
       </div>
-      <div class="bcast-block">
-        <div class="sec-lbl">Afficher le classement</div>
-        <button class="big-btn bbv-blue" id="btnC" onclick="showClassement()">
-          <div class="bbt">Envoyer le classement sur OBS</div>
-          <div class="bbd">Tableau centré avec toutes les pirogues classées</div>
-          <div class="live-flag"><div class="ldot2"></div>Classement en direct</div>
-        </button>
-      </div>
-      <div class="bcast-block">
-        <div class="sec-lbl">Annoncer une arrivée</div>
-        <select class="sel" id="bnTeam" style="margin-bottom:7px;width:100%"><option value="">Pirogue...</option></select>
-        <select class="sel" id="bnPlace" style="margin-bottom:7px;width:100%"><option value="">Place obtenue...</option></select>
-        <button class="big-btn bbv-green" id="btnB" onclick="showBanner()">
-          <div class="bbt">Afficher le bandeau d'arrivée</div>
-          <div class="bbd">Bandeau en bas à gauche de l'écran OBS</div>
-          <div class="live-flag"><div class="ldot2"></div>Bandeau en direct</div>
-        </button>
-      </div>
-      <div class="bcast-block">
-        <button class="big-btn bbv-red" onclick="hideAll()">
-          <div class="bbt">Masquer tout l'overlay</div>
-          <div class="bbd">Retire classement et bandeau immédiatement</div>
-        </button>
+      <div class="ob-action">
+        <button class="ob-btn ob-red" onclick="hideAll()">Masquer</button>
       </div>
     </div>
   </div>
@@ -211,7 +201,7 @@
   ONGLET 3 — PARTENAIRES
 ════════════════════════════════════════════ -->
 <div class="tab-panel" id="panel-partenaires">
-<div class="two-col" style="grid-template-columns:1fr 280px">
+<div class="two-col" style="grid-template-columns:1fr auto">
 
   <!-- Col 1 : liste sponsors -->
   <div class="col">
@@ -226,38 +216,26 @@
   </div>
 
   <!-- Col 2 : diffusion -->
-  <div class="col">
+  <div class="col ob-col">
     <div class="preview-wrap">
       <div class="preview-label">Aperçu live</div>
       <iframe src="/overlay" class="preview-iframe" scrolling="no"></iframe>
       <div class="preview-btns">
-        <button class="preview-btn" onclick="previewPopout()" title="Ouvrir dans une fenêtre">⤢</button>
+        <button class="preview-btn" onclick="previewPopout()" title="Agrandir">⤢</button>
         <button class="preview-btn" onclick="previewFullscreen(this)" title="Plein écran">⛶</button>
       </div>
     </div>
-    <div class="col-head">
-      <div class="col-head-title">Diffusion OBS</div>
-      <div class="col-head-desc">Sélectionnez puis diffusez</div>
-    </div>
-    <div class="bcast-inner">
-      <div class="bcast-block">
-        <div class="sec-lbl">Partenaire actif</div>
-        <div class="status-card">
-          <div class="status-line"><div class="s-dot" id="stDotSp"></div><span class="s-key">Affiché</span><span class="s-val" id="stValSp">Aucun</span></div>
-        </div>
+    <div class="ob-panel">
+      <div class="ob-status">
+        <div class="ob-dot" id="stDotSp"></div>
+        <span class="ob-status-txt" id="stValSp">Aucun</span>
       </div>
-      <div class="bcast-block">
-        <div class="sec-lbl">Choisir le partenaire</div>
+      <div class="ob-action">
         <select class="sel" id="selSponsor" style="width:100%;margin-bottom:8px"><option value="">Partenaire à afficher...</option></select>
-        <button class="big-btn bbv-purple" id="btnSp" onclick="showSponsor()">
-          <div class="bbt">Afficher le partenaire sur OBS</div>
-          <div class="bbd">Carte centrée avec logo et description</div>
-          <div class="live-flag"><div class="ldot2"></div>Partenaire en direct</div>
-        </button>
-        <button class="big-btn bbv-red" onclick="hideAll()" style="margin-top:8px">
-          <div class="bbt">Masquer</div>
-          <div class="bbd">Retire la carte de l'écran</div>
-        </button>
+        <button class="ob-btn ob-purple" id="btnSp" onclick="showSponsor()">Diffuser</button>
+      </div>
+      <div class="ob-action">
+        <button class="ob-btn ob-red" onclick="hideAll()">Masquer</button>
       </div>
     </div>
   </div>
@@ -497,19 +475,24 @@ document.getElementById('fileInput').addEventListener('change', async function()
 // ════════════════════════════════════════════════════
 //  DIFFUSION
 // ════════════════════════════════════════════════════
-function showClassement(){ send({type:'show_classement',race:currentRace}); toast('Classement → OBS'); }
+function showClassement(){
+  if(overlay.mode==='classement'&&overlay.race===currentRace){ hideAll(); return; }
+  send({type:'show_classement',race:currentRace}); toast('Classement → OBS');
+}
+function getNextPlace(){ return ((races[currentRace]||{}).ranking||[]).length+1; }
 function showBanner(){
   const team=document.getElementById('bnTeam').value;
-  const place=parseInt(document.getElementById('bnPlace').value);
   if(!team){toast('Sélectionnez une pirogue');return;}
-  if(!place){toast('Sélectionnez une place');return;}
+  if(overlay.mode==='arrivee'&&overlay.team===team){ hideAll(); return; }
+  const place=Math.max(1,parseInt(document.getElementById('bnPlace').value)||getNextPlace());
   send({type:'show_banner',race:currentRace,team,place});
-  toast('Bandeau : '+team);
+  toast('Arrivée : '+team+' — '+place+(place===1?'re':'e'));
 }
 function showBandeauCours(){
   const el=document.getElementById('stValCours');
   const team=el.dataset.selected||'';
   const race=el.dataset.race||'medium';
+  if(overlay.mode==='bandeau_course'){ hideAll(); return; }
   if(!team){toast('Sélectionnez une pirogue en cours');return;}
   send({type:'show_bandeau_course',race,team});
   toast('Bandeau en course : '+team);
@@ -517,6 +500,7 @@ function showBandeauCours(){
 function showSponsor(){
   const sp=document.getElementById('selSponsor').value;
   if(!sp){toast('Sélectionnez un partenaire');return;}
+  if(overlay.mode==='partenaires'&&overlay.sponsor===sp){ hideAll(); return; }
   send({type:'show_sponsor',sponsor:sp});
   toast('Partenaire : '+sp);
 }
@@ -535,26 +519,35 @@ function selectPirogueEnCours(name, race){
 function syncUI(){
   const ov=overlay;
   ['btnC','btnB','btnCours','btnSp'].forEach(id=>{ const el=document.getElementById(id); if(el) el.classList.remove('live-on'); });
-  ['stDotC','stDotB','stDotCours','stDotSp'].forEach(id=>{ const el=document.getElementById(id); if(el) el.classList.remove('on'); });
-  ['stValC','stValB','stValSp'].forEach(id=>{ const el=document.getElementById(id); if(el) el.textContent='Masqué'; });
+  ['stDotC','stDotCours','stDotSp'].forEach(id=>{ const el=document.getElementById(id); if(el) el.classList.remove('on'); });
+
+  const stC=document.getElementById('stValC');
+  const stSp=document.getElementById('stValSp');
+  if(stC){ stC.textContent='Masqué'; stC.classList.remove('live'); }
+  if(stSp){ stSp.textContent='Aucun'; stSp.classList.remove('live'); }
 
   document.querySelectorAll('.tab,.race-tab').forEach(el=>el.classList.remove('live'));
 
-  const raceName=(races[ov.race]||{}).name||ov.race||'';
+  const raceData=races[ov.race]||{};
+  const raceName=raceData.displayName||raceData.name||ov.race||'';
   if (ov.mode==='classement'&&ov.showAll) {
     const r=races[ov.race]||{ranking:[]};
     act('btnC','stDotC');
-    document.getElementById('stValC').textContent=r.ranking.length+' pirogues · '+raceName;
+    if(stC){ stC.textContent='Classement · '+raceName; stC.classList.add('live'); }
     document.getElementById('tab-classement').classList.add('live');
     const rtab=document.getElementById('rtab-'+(ov.race||'medium')); if(rtab)rtab.classList.add('live');
   } else if (ov.mode==='arrivee'&&ov.team) {
-    act('btnB','stDotB'); document.getElementById('stValB').textContent=ov.team+' — '+ov.place+(ov.place===1?'re':'e')+' pl. · '+raceName;
+    act('btnB','stDotC');
+    if(stC){ stC.textContent=ov.team+' — '+ov.place+(ov.place===1?'re':'e'); stC.classList.add('live'); }
     document.getElementById('tab-classement').classList.add('live');
   } else if (ov.mode==='bandeau_course') {
-    act('btnCours','stDotCours'); document.getElementById('stValCours').textContent=ov.team||'—';
+    act('btnCours','stDotCours');
+    const coursEl=document.getElementById('stValCours');
+    if(coursEl) coursEl.textContent=ov.team||'—';
     document.getElementById('tab-encours').classList.add('live');
   } else if (ov.mode==='partenaires') {
-    act('btnSp','stDotSp'); document.getElementById('stValSp').textContent=ov.sponsor||'—';
+    act('btnSp','stDotSp');
+    if(stSp){ stSp.textContent=ov.sponsor||'—'; stSp.classList.add('live'); }
     document.getElementById('tab-partenaires').classList.add('live');
   }
 }
@@ -676,14 +669,15 @@ function renderSponsors(){
 }
 
 function renderBannerSelects(){
-  const race=races[currentRace]||{teams:[]};
+  const race=races[currentRace]||{teams:[],ranking:[]};
   const bt=document.getElementById('bnTeam'), bv=bt.value;
   bt.innerHTML='<option value="">Pirogue...</option>'+race.teams.map(t=>`<option value="${esc(t)}" ${bv===t?'selected':''}>${t}</option>`).join('');
   if(bv)bt.value=bv;
-  const bp=document.getElementById('bnPlace'), pv=bp.value;
-  const mx=Math.max(race.teams.length,20);
-  bp.innerHTML='<option value="">Place obtenue...</option>'+Array.from({length:mx},(_,i)=>i+1).map(p=>`<option value="${p}" ${pv==p?'selected':''}>${p}${p===1?'re':'e'} place</option>`).join('');
-  if(pv)bp.value=pv;
+  const pb=document.getElementById('bnPlace');
+  if(pb&&!pb._manual){
+    const pos=bv?race.ranking.indexOf(bv):-1;
+    pb.value=pos>=0?pos+1:getNextPlace();
+  }
 }
 
 function copyObs(){ navigator.clipboard.writeText('http://localhost:8765/overlay').then(()=>toast('URL OBS copiée')); }
@@ -861,8 +855,61 @@ function initColorPicker(){
   syncColorSwatches();
 }
 
+// ════════════════════════════════════════════════════
+//  SPLIT PANE (drag to resize classement / diffusion)
+// ════════════════════════════════════════════════════
+const SPLIT_KEY='vva-split-w';
+let splitDrag=false, splitX0=0, splitW0=0;
+
+function initSplit(){
+  const saved=parseInt(localStorage.getItem(SPLIT_KEY));
+  if(saved>0) document.getElementById('splitLeft').style.flex=`0 0 ${saved}px`;
+  document.getElementById('splitHandle').addEventListener('mousedown',e=>{
+    splitDrag=true;
+    splitX0=e.clientX;
+    splitW0=document.getElementById('splitLeft').getBoundingClientRect().width;
+    document.getElementById('splitHandle').classList.add('active');
+    document.body.style.cursor='col-resize';
+    document.body.style.userSelect='none';
+    e.preventDefault();
+  });
+}
+document.addEventListener('mousemove',e=>{
+  if(!splitDrag)return;
+  const pane=document.getElementById('splitPane');
+  const left=document.getElementById('splitLeft');
+  const paneW=pane.getBoundingClientRect().width;
+  const newW=Math.max(180,Math.min(paneW-230,splitW0+(e.clientX-splitX0)));
+  left.style.flex=`0 0 ${newW}px`;
+});
+document.addEventListener('mouseup',()=>{
+  if(!splitDrag)return;
+  splitDrag=false;
+  document.getElementById('splitHandle').classList.remove('active');
+  document.body.style.cursor='';
+  document.body.style.userSelect='';
+  const w=document.getElementById('splitLeft').getBoundingClientRect().width;
+  localStorage.setItem(SPLIT_KEY,Math.round(w));
+});
+
 connect();
 initColorPicker();
+initSplit();
+// Changer la pirogue → recalcule la place d'après le classement existant
+document.getElementById('bnTeam').addEventListener('change', function(){
+  const pb=document.getElementById('bnPlace');
+  if(!pb)return;
+  pb._manual=false;
+  const race=races[currentRace]||{ranking:[]};
+  const pos=race.ranking.indexOf(this.value);
+  pb.value=pos>=0?pos+1:getNextPlace();
+});
+// Marquer comme modifié manuellement si l'opérateur change la place
+document.getElementById('bnPlace').addEventListener('input', function(){ this._manual=true; });
+// Changer de course → réactive la préselection auto
+document.querySelectorAll('.race-tab').forEach(el=>el.addEventListener('click',()=>{
+  const pb=document.getElementById('bnPlace'); if(pb) pb._manual=false;
+}));
 </script>
 </body>
 </html>

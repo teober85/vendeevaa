@@ -52,11 +52,11 @@
     }
   },
   "overlay": {
-    "mode": "classement",
+    "mode": "hidden",
     "race": "large",
-    "team": "",
+    "team": "MOANA MANU NUI",
     "place": 0,
-    "showAll": true,
+    "showAll": false,
     "sponsor": ""
   },
   "sponsors": [
