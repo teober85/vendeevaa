@@ -29,8 +29,8 @@
         "EDEN VA A"
       ],
       "ranking": [
-        "MOANA MANU NUI",
         "THE LOVEBOAT",
+        "MOANA MANU NUI",
         "AUKAI CANOE CLUB",
         "TE RANA TANE",
         "HEKE MOANA CHATEL",
@@ -66,10 +66,10 @@
     }
   },
   "overlay": {
-    "mode": "arrivee",
+    "mode": "hidden",
     "race": "large",
     "team": "MOANA MANU NUI",
-    "place": 1,
+    "place": 2,
     "showAll": false,
     "sponsor": ""
   },

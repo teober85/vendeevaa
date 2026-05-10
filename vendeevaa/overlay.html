@@ -267,7 +267,27 @@ function updateScale() {
 window.addEventListener('resize', updateScale);
 updateScale();
 
+/* ── Digest : résumé des données utiles à l'overlay ── */
+function overlayDigest(msg) {
+  const ov = msg.overlay || {};
+  const mode = ov.mode || 'hidden';
+  if (mode === 'hidden') return '{"mode":"hidden"}';
+  const race = ((msg.races || {})[ov.race]) || {};
+  const base = { ov, courseName: msg.courseName };
+  if (mode === 'classement')
+    return JSON.stringify({ ...base, ranking: race.ranking, teamNumbers: race.teamNumbers, raceStatus: race.raceStatus, displayName: race.displayName, distance: race.distance });
+  if (mode === 'arrivee')
+    return JSON.stringify({ ...base, teamNumbers: race.teamNumbers, displayName: race.displayName, distance: race.distance });
+  if (mode === 'bandeau_course')
+    return JSON.stringify({ ...base, teamNumbers: race.teamNumbers, displayName: race.displayName });
+  if (mode === 'partenaires')
+    return JSON.stringify({ ov, sponsors: msg.sponsors });
+  return JSON.stringify(ov);
+}
+
 /* ── WebSocket ───────────────────────────────── */
+let lastDigest = null;
+
 function connect() {
   const ws = new WebSocket(WS_URL);
   ws.onmessage = e => {
@@ -275,7 +295,11 @@ function connect() {
     if (msg.type==='full_state') {
       fullState = msg;
       applyColors(msg.colors);
-      applyOverlay(msg.overlay||{mode:'hidden'}, msg);
+      const digest = overlayDigest(msg);
+      if (digest !== lastDigest) {
+        lastDigest = digest;
+        applyOverlay(msg.overlay||{mode:'hidden'}, msg);
+      }
     }
   };
   ws.onclose = () => setTimeout(connect, 1500);
