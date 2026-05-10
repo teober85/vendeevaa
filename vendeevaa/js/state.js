@@ -1,0 +1,13 @@
+const WS_URL = 'ws://localhost:8766';
+let ws;
+let races = {}, sponsors = [], courseName = 'Jeudi';
+let overlay = { mode: 'hidden', race: 'medium', team: '', place: 0, showAll: false, sponsor: '' };
+let dragIdx = null;
+let currentTab = 'classement';
+let currentRace = 'medium';
+let fileCallback = null;
+const DEFAULT_COLORS = { primary: '#2d6ea8', accent: '#4490c8', background: '#070e1c' };
+let overlayColors = { ...DEFAULT_COLORS };
+let cpTarget = 'primary';
+let cpHSV = { h: 210, s: 0.73, v: 0.66 };
+let cpDragging = null;

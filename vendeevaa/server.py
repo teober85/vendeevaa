@@ -317,6 +317,8 @@ class Handler(BaseHTTPRequestHandler):
             self.serve_file("overlay.html")
         elif path.endswith('.css') and '/' not in path.lstrip('/'):
             self.serve_file(path.lstrip('/'), "text/css; charset=utf-8")
+        elif path.startswith('/js/') and path.endswith('.js') and path.count('/') == 2:
+            self.serve_file(path.lstrip('/'), "application/javascript; charset=utf-8")
         else:
             self.send_error(404)
 
