@@ -56,11 +56,12 @@ html, body { width:100%; height:100%; background:transparent; overflow:hidden; }
 }
 .lb-head {
   position:relative; z-index:1; background:var(--blue); height:66px; padding:0 32px;
-  display:flex; align-items:center;
+  display:flex; flex-direction:column; justify-content:center;
   clip-path:polygon(0 0,100% 0,97% 100%,0 100%);
 }
 .lb-head::after { content:''; position:absolute; bottom:0; left:0; right:0; height:2px; background:linear-gradient(to right,rgba(255,255,255,.35),rgba(255,255,255,.04)); }
-.lb-tit { font-family:'Barlow Condensed',sans-serif; font-size:34px; font-weight:900; letter-spacing:6px; text-transform:uppercase; color:#fff; }
+.lb-sub { display:none; }
+.lb-tit { font-family:'Barlow Condensed',sans-serif; font-size:32px; font-weight:900; letter-spacing:5px; text-transform:uppercase; color:#fff; line-height:1; }
 
 .lb-body { position:relative; z-index:1; background:var(--navy); border-left:3px solid var(--blue); border-right:3px solid rgba(45,110,168,.2); }
 .lb-cols { display:grid; grid-template-columns:72px 1fr; padding:7px 24px 5px; border-bottom:1px solid rgba(45,110,168,.18); }

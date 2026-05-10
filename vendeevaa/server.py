@@ -36,6 +36,7 @@ DEFAULT_STATE = {
         "showAll": False,
         "sponsor": "",
     },
+    "courseName": "Jeudi",
     "sponsors": [],
     "colors": {
         "primary":    "#2d6ea8",
@@ -190,6 +191,10 @@ async def ws_handler(websocket):
                     if "enabled" in msg and race_id == "selectif":
                         r["enabled"] = bool(msg["enabled"])
                     await broadcast_state()
+
+            elif t == "set_course_name":
+                state["courseName"] = str(msg.get("courseName", "")).strip()
+                await broadcast_state()
 
             # ── Overlay ──────────────────────────────
             elif t == "show_classement":

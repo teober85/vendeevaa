@@ -43,9 +43,13 @@
         "EDEN VA A"
       ],
       "teamNumbers": {
-        "MOANA MANU NUI": "10",
-        "THE LOVEBOAT": "11",
-        "UCKERDRACHEN": "12"
+        "MOANA MANU NUI": "1",
+        "THE LOVEBOAT": "3",
+        "UCKERDRACHEN": "4",
+        "NORD BASSIN VA A": "2",
+        "TE RANA TANE": "5",
+        "TEAM HEKE MOANA CHATEL": "6",
+        "RIMA HERE VA A": "7"
       }
     },
     "selectif": {
@@ -59,13 +63,14 @@
     }
   },
   "overlay": {
-    "mode": "hidden",
+    "mode": "classement",
     "race": "large",
-    "team": "MOANA MANU NUI",
-    "place": 1,
-    "showAll": false,
+    "team": "",
+    "place": 0,
+    "showAll": true,
     "sponsor": ""
   },
+  "courseName": "Jeudi",
   "sponsors": [
     {
       "nom": "Nouveau partenaire",

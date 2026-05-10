@@ -24,6 +24,7 @@
     <path d="M341 22 C345 14 341 6 333 8 C327 10 321 14 323 22" stroke="#2d6ea8" stroke-width="2.2" stroke-linecap="round" opacity="0.6"/>
   </svg>
   <div class="lb-head">
+    <div class="lb-sub" id="lbCourseName"></div>
     <div class="lb-tit" id="lbRaceName">—</div>
   </div>
   <div class="lb-body">
@@ -200,11 +201,14 @@ function applyOverlay(st, state) {
 
   const race = getRace(st.race);
   const displayName = race.displayName || race.name || '';
+  const dist = race.distance ? ' · ' + race.distance + ' km' : '';
+  const raceLabel = displayName + dist;
+  const cName = (state.courseName || '').toUpperCase();
 
   switch(st.mode) {
     case 'classement':
       [bn,bc,sp].forEach(hide);
-      document.getElementById('lbRaceName').textContent = displayName;
+      document.getElementById('lbRaceName').textContent = [cName, raceLabel].filter(Boolean).join('  ·  ');
       renderClassement((race.ranking)||[], race.teamNumbers||{});
       show(lb);
       break;
@@ -214,7 +218,7 @@ function applyOverlay(st, state) {
       document.getElementById('bnNum').className    = 'bn-num'+(st.place===1?' p1':'');
       document.getElementById('bnSuf').textContent  = st.place===1?'ÈRE PLACE':'ÈME PLACE';
       document.getElementById('bnName').textContent = (st.team||'').toUpperCase();
-      document.getElementById('bnRaceLabel').textContent = displayName;
+      document.getElementById('bnRaceLabel').textContent = [cName, raceLabel].filter(Boolean).join(' · ');
       const pirNum = (race.teamNumbers||{})[st.team]||'';
       const pirEl  = document.getElementById('bnPirNum');
       pirEl.textContent = pirNum; pirEl.style.display = pirNum ? 'flex' : 'none';
@@ -223,7 +227,7 @@ function applyOverlay(st, state) {
     }
     case 'bandeau_course':
       [lb,bn,sp].forEach(hide);
-      document.getElementById('bcRaceLabel').textContent = (displayName || 'En course').toUpperCase();
+      document.getElementById('bcRaceLabel').textContent = (cName || displayName || 'En course');
       renderBandeauCourse(st.team||'', (race.teamNumbers||{})[st.team]||'');
       show(bc);
       break;
