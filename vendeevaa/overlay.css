@@ -93,6 +93,8 @@ html, body { width:100%; height:100%; background:transparent; overflow:hidden; }
 /* ════════════════════════════════════════════════════
    2. BANDEAU ARRIVÉE — bas gauche
 ════════════════════════════════════════════════════ */
+@keyframes bannerIn  { from{transform:translateX(-108%)} to{transform:translateX(0)} }
+@keyframes bannerOut { from{transform:translateX(0)}    to{transform:translateX(-108%)} }
 #banner {
   display:none;
   position:absolute; bottom:72px; left:0; width:680px;
@@ -100,8 +102,8 @@ html, body { width:100%; height:100%; background:transparent; overflow:hidden; }
   transform:translateX(-108%); opacity:1;
   filter:drop-shadow(0 12px 48px rgba(0,0,0,.65));
 }
-#banner.vis  { display:block; transform:translateX(0);    transition:transform .7s cubic-bezier(.16,1,.3,1); }
-#banner.hide { display:block; transform:translateX(-108%);transition:transform .5s cubic-bezier(.4,0,1,1); }
+#banner.vis  { display:block; animation:bannerIn  .7s cubic-bezier(.16,1,.3,1) forwards; }
+#banner.hide { display:block; animation:bannerOut .5s cubic-bezier(.4,0,1,1) forwards; }
 
 .bn-stripe { background:var(--blue); height:38px; display:flex; align-items:center; padding:0 28px; gap:14px; clip-path:polygon(0 0,100% 0,97% 100%,0 100%); }
 .bn-slbl { font-family:'Barlow Condensed',sans-serif; font-size:13px; font-weight:800; letter-spacing:4px; text-transform:uppercase; color:#fff; }

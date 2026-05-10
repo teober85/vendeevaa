@@ -63,11 +63,11 @@
     }
   },
   "overlay": {
-    "mode": "classement",
+    "mode": "hidden",
     "race": "large",
-    "team": "",
-    "place": 0,
-    "showAll": true,
+    "team": "MOANA MANU NUI",
+    "place": 1,
+    "showAll": false,
     "sponsor": ""
   },
   "courseName": "Jeudi",
