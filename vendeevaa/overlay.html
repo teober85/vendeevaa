@@ -136,15 +136,17 @@ function hideAll() {
 function ordinal(n) { return n===1?'1re':n+'e'; }
 function rowGrade(i){ return i<=2?' r'+(i+1):''; }
 
-function renderClassement(ranking, teamNumbers) {
+function renderClassement(ranking, teamNumbers, raceStatus) {
   const nums = teamNumbers || {};
+  const statuses = raceStatus || {};
   const rows = document.getElementById('lbRows');
   rows.querySelectorAll('.lb-row.in').forEach(r => r.classList.replace('in','out'));
   setTimeout(() => {
     rows.innerHTML = ranking.map((name,i) => {
       const num = nums[name] || '';
+      const st = statuses[name] || '';
       return `
-        <div class="lb-row${rowGrade(i)}" data-r>
+        <div class="lb-row${rowGrade(i)}${st?' status-'+st:''}" data-r>
           <div class="lb-rank">${i+1}</div>
           <div class="lb-name-wrap">
             <div class="lb-name">${name.toUpperCase()}</div>
@@ -209,7 +211,7 @@ function applyOverlay(st, state) {
     case 'classement':
       [bn,bc,sp].forEach(hide);
       document.getElementById('lbRaceName').textContent = [cName, raceLabel].filter(Boolean).join('  ·  ');
-      renderClassement((race.ranking)||[], race.teamNumbers||{});
+      renderClassement((race.ranking)||[], race.teamNumbers||{}, race.raceStatus||{});
       show(lb);
       break;
     case 'arrivee': {

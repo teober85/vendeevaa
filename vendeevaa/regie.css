@@ -126,6 +126,22 @@ body { background:var(--deep); color:var(--white); font-family:'Barlow',sans-ser
 .arr-btn:disabled { opacity:.1; cursor:default; }
 .arr-btn+.arr-btn { border-top:1px solid var(--line); }
 
+/* Status buttons */
+.rr-status { align-self:stretch; display:flex; flex-direction:column; border-left:1px solid var(--line); flex-shrink:0; }
+.rr-stat-btn { flex:1; background:transparent; border:none; width:36px; display:flex; align-items:center; justify-content:center; cursor:pointer; font-size:13px; font-weight:900; color:rgba(122,160,192,.18); transition:background .12s,color .12s; font-family:'Barlow Condensed',sans-serif; }
+.rr-stat-btn:hover { background:rgba(45,110,168,.15); color:var(--mist); }
+.rr-stat-btn.is-arrive { color:var(--green); background:rgba(46,204,113,.1); }
+.rr-stat-btn.is-arrive:hover { background:rgba(46,204,113,.2); }
+.rr-stat-btn.is-abandon { color:var(--red); background:rgba(232,64,64,.1); }
+.rr-stat-btn.is-abandon:hover { background:rgba(232,64,64,.2); }
+.rr-stat-btn+.rr-stat-btn { border-top:1px solid var(--line); }
+
+/* Row overrides for statuses */
+.rank-row.status-arrive { border-color:rgba(46,204,113,.25) !important; background:rgba(46,204,113,.05) !important; }
+.rank-row.status-arrive .rr-name { color:rgba(46,204,113,.85); }
+.rank-row.status-abandon { opacity:.55; }
+.rank-row.status-abandon .rr-name { text-decoration:line-through; color:rgba(200,80,80,.7); }
+
 /* ─ BIG BUTTONS ─ */
 .big-btn { width:100%; border:none; border-radius:7px; cursor:pointer; padding:14px 16px; display:flex; flex-direction:column; align-items:flex-start; text-align:left; transition:all .17s; position:relative; overflow:hidden; margin-bottom:8px; }
 .big-btn:last-child { margin-bottom:0; }

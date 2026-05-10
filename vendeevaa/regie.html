@@ -644,14 +644,16 @@ function addToRankingDirect(name){
 }
 
 function renderRankList(){
-  const race=races[currentRace]||{teams:[],ranking:[],teamNumbers:{}};
+  const race=races[currentRace]||{teams:[],ranking:[],teamNumbers:{},raceStatus:{}};
   const nums=race.teamNumbers||{};
+  const statuses=race.raceStatus||{};
   const el=document.getElementById('rankList');
   const rc=i=>i===0?'rr-first':i===1?'rr-second':i===2?'rr-third':'';
   el.innerHTML=race.ranking.length?race.ranking.map((t,i)=>{
     const num=nums[t]||'';
+    const st=statuses[t]||'';
     return `
-    <div class="rank-row ${rc(i)}" data-idx="${i}" draggable="true"
+    <div class="rank-row ${rc(i)}${st?' status-'+st:''}" data-idx="${i}" draggable="true"
          ondragstart="onDragStart(event,${i})" ondragend="onDragEnd(event)"
          ondragover="onDragOver(event)" ondrop="onDrop(event)">
       <div class="rr-num ${nc(i)}">${i+1}</div>
@@ -662,8 +664,18 @@ function renderRankList(){
         <button class="arr-btn" onclick="moveUp(${i})" ${i===0?'disabled':''}>▲</button>
         <button class="arr-btn" onclick="moveDown(${i})" ${i===race.ranking.length-1?'disabled':''}>▼</button>
       </div>
+      <div class="rr-status">
+        <button class="rr-stat-btn ${st==='arrive'?'is-arrive':''}" title="Arrivé"
+                onclick="setTeamStatus('${esc(t)}','${st==='arrive'?'':'arrive'}')">✓</button>
+        <button class="rr-stat-btn ${st==='abandon'?'is-abandon':''}" title="Abandon"
+                onclick="setTeamStatus('${esc(t)}','${st==='abandon'?'':'abandon'}')">✕</button>
+      </div>
     </div>`;
   }).join(''):'<div class="empty">Aucune pirogue classée</div>';
+}
+
+function setTeamStatus(name, status){
+  send({type:'set_team_status', race:currentRace, name, status});
 }
 
 function renderCourseList(){

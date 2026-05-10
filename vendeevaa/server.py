@@ -24,9 +24,9 @@ SAVE_FILE  = DATA_DIR / "data.json"
 # ─── État par défaut ──────────────────────────────────
 DEFAULT_STATE = {
     "races": {
-        "medium":  {"name": "Medium",           "displayName": "Parcours M", "distance": "", "teams": [], "ranking": [], "teamNumbers": {}},
-        "large":   {"name": "Large",            "displayName": "Parcours L", "distance": "", "teams": [], "ranking": [], "teamNumbers": {}},
-        "selectif":{"name": "Sélectif National","displayName": "Sélectif",  "distance": "", "teams": [], "ranking": [], "teamNumbers": {}, "enabled": False},
+        "medium":  {"name": "Medium",           "displayName": "Parcours M", "distance": "", "teams": [], "ranking": [], "teamNumbers": {}, "raceStatus": {}},
+        "large":   {"name": "Large",            "displayName": "Parcours L", "distance": "", "teams": [], "ranking": [], "teamNumbers": {}, "raceStatus": {}},
+        "selectif":{"name": "Sélectif National","displayName": "Sélectif",  "distance": "", "teams": [], "ranking": [], "teamNumbers": {}, "raceStatus": {}, "enabled": False},
     },
     "overlay": {
         "mode":    "hidden",   # hidden|classement|arrivee|bandeau_course|partenaires
@@ -131,6 +131,8 @@ async def ws_handler(websocket):
                     r = state["races"][race_id]
                     r["teams"]   = [x for x in r["teams"]   if x != name]
                     r["ranking"] = [x for x in r["ranking"] if x != name]
+                    if "raceStatus" in r and name in r["raceStatus"]:
+                        del r["raceStatus"][name]
                     if state["overlay"].get("race") == race_id and state["overlay"].get("team") == name:
                         state["overlay"]["mode"] = "hidden"
                         state["overlay"]["team"] = ""
@@ -145,6 +147,8 @@ async def ws_handler(websocket):
                         idx = r["teams"].index(old)
                         r["teams"][idx] = new
                         r["ranking"] = [new if x == old else x for x in r["ranking"]]
+                        if "raceStatus" in r and old in r["raceStatus"]:
+                            r["raceStatus"][new] = r["raceStatus"].pop(old)
                         if state["overlay"].get("race") == race_id and state["overlay"].get("team") == old:
                             state["overlay"]["team"] = new
                         await broadcast_state()
@@ -227,6 +231,20 @@ async def ws_handler(websocket):
             elif t == "set_sponsors":
                 state["sponsors"] = msg.get("sponsors", [])
                 await broadcast_state()
+
+            # ── Statuts pirogue ───────────────────────
+            elif t == "set_team_status":
+                name   = msg.get("name", "")
+                status = msg.get("status", "")  # "arrive" | "abandon" | ""
+                if race_id in state["races"] and name in state["races"][race_id]["teams"]:
+                    r = state["races"][race_id]
+                    if "raceStatus" not in r:
+                        r["raceStatus"] = {}
+                    if status in ("arrive", "abandon"):
+                        r["raceStatus"][name] = status
+                    else:
+                        r["raceStatus"].pop(name, None)
+                    await broadcast_state()
 
             # ── Couleurs ──────────────────────────────
             elif t == "set_colors":

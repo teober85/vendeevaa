@@ -77,6 +77,18 @@ html, body { width:100%; height:100%; background:transparent; overflow:hidden; }
 .lb-row.r1::before{background:var(--blue3);}
 .lb-row.r2::before{background:rgba(68,144,200,.45);}
 .lb-row.r3::before{background:rgba(68,144,200,.22);}
+
+/* Status: arrivé */
+.lb-row.status-arrive { background:rgba(46,204,113,.07) !important; border-bottom-color:rgba(46,204,113,.15); }
+.lb-row.status-arrive::before { background:rgba(46,204,113,.8) !important; }
+.lb-row.status-arrive .lb-name { color:rgba(46,204,113,.9); }
+.lb-row.status-arrive .lb-rank { color:rgba(46,204,113,.35); }
+.lb-row.status-arrive::after { content:'ARRIVÉ'; position:absolute; right:18px; top:50%; transform:translateY(-50%); font-family:'Barlow Condensed',sans-serif; font-size:10px; font-weight:800; letter-spacing:3px; color:rgba(46,204,113,.65); }
+
+/* Status: abandon */
+.lb-row.status-abandon { opacity:.42; }
+.lb-row.status-abandon .lb-name { text-decoration:line-through; color:rgba(200,80,80,.7); }
+.lb-row.status-abandon::after { content:'ABANDON'; position:absolute; right:18px; top:50%; transform:translateY(-50%); font-family:'Barlow Condensed',sans-serif; font-size:10px; font-weight:800; letter-spacing:3px; color:rgba(232,64,64,.55); }
 .lb-rank { font-family:'Barlow Condensed',sans-serif; font-size:52px; font-weight:900; line-height:1; color:rgba(255,255,255,.14); letter-spacing:-2px; }
 .r1 .lb-rank{color:rgba(255,255,255,.9);}
 .r2 .lb-rank{color:rgba(255,255,255,.55);}

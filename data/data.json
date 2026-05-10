@@ -6,7 +6,8 @@
       "distance": "15",
       "teams": [],
       "ranking": [],
-      "teamNumbers": {}
+      "teamNumbers": {},
+      "raceStatus": {}
     },
     "large": {
       "name": "Large",
@@ -50,7 +51,8 @@
         "TE RANA TANE": "5",
         "TEAM HEKE MOANA CHATEL": "6",
         "RIMA HERE VA A": "7"
-      }
+      },
+      "raceStatus": {}
     },
     "selectif": {
       "name": "Sélectif National",
@@ -59,11 +61,12 @@
       "teams": [],
       "ranking": [],
       "teamNumbers": {},
+      "raceStatus": {},
       "enabled": false
     }
   },
   "overlay": {
-    "mode": "hidden",
+    "mode": "arrivee",
     "race": "large",
     "team": "MOANA MANU NUI",
     "place": 1,
