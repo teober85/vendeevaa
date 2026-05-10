@@ -63,9 +63,9 @@ html, body { width:100%; height:100%; background:transparent; overflow:hidden; }
 .lb-tit { font-family:'Barlow Condensed',sans-serif; font-size:34px; font-weight:900; letter-spacing:6px; text-transform:uppercase; color:#fff; }
 
 .lb-body { position:relative; z-index:1; background:var(--navy); border-left:3px solid var(--blue); border-right:3px solid rgba(45,110,168,.2); }
-.lb-cols { display:grid; grid-template-columns:80px 1fr; padding:7px 24px 5px; border-bottom:1px solid rgba(45,110,168,.18); }
+.lb-cols { display:grid; grid-template-columns:72px 1fr; padding:7px 24px 5px; border-bottom:1px solid rgba(45,110,168,.18); }
 .lb-col  { font-family:'Barlow Condensed',sans-serif; font-size:11px; font-weight:700; letter-spacing:3px; text-transform:uppercase; color:rgba(255,255,255,.25); }
-.lb-row  { display:grid; grid-template-columns:80px 1fr; align-items:center; padding:0 24px; height:72px; border-bottom:1px solid rgba(45,110,168,.1); opacity:0; transform:translateX(-16px); transition:opacity .4s ease, transform .4s ease; position:relative; }
+.lb-row  { display:grid; grid-template-columns:72px 1fr; align-items:center; padding:0 24px; height:72px; border-bottom:1px solid rgba(45,110,168,.1); opacity:0; transform:translateX(-16px); transition:opacity .4s ease, transform .4s ease; position:relative; }
 .lb-row.in  { opacity:1; transform:translateX(0); }
 .lb-row.out { opacity:0; transform:translateX(16px); transition:opacity .25s ease, transform .25s ease; }
 .lb-row:last-child { border-bottom:none; }
@@ -80,8 +80,14 @@ html, body { width:100%; height:100%; background:transparent; overflow:hidden; }
 .r1 .lb-rank{color:rgba(255,255,255,.9);}
 .r2 .lb-rank{color:rgba(255,255,255,.55);}
 .r3 .lb-rank{color:rgba(255,255,255,.35);}
-.lb-name { font-family:'Barlow Condensed',sans-serif; font-size:34px; font-weight:600; letter-spacing:.5px; text-transform:uppercase; color:rgba(255,255,255,.82); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.lb-name-wrap { display:flex; align-items:center; gap:14px; overflow:hidden; min-width:0; }
+.lb-name { flex:0 1 auto; min-width:0; font-family:'Barlow Condensed',sans-serif; font-size:34px; font-weight:600; letter-spacing:.5px; text-transform:uppercase; color:rgba(255,255,255,.82); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
 .r1 .lb-name{font-weight:900;color:#fff;font-size:38px;}
+.lb-num { flex-shrink:0; width:46px; height:46px; border-radius:50%; border:2px solid rgba(255,255,255,.25); background:rgba(255,255,255,.05); display:flex; align-items:center; justify-content:center; font-family:'Barlow Condensed',sans-serif; font-size:20px; font-weight:900; color:rgba(255,255,255,.65); letter-spacing:0; }
+.lb-num-empty { border-color:transparent; background:transparent; }
+.r1 .lb-num { border-color:var(--blue3); color:var(--blue3); background:rgba(68,144,200,.12); }
+.r2 .lb-num { border-color:rgba(195,215,230,.38); color:rgba(195,215,230,.6); }
+.r3 .lb-num { border-color:rgba(195,155,75,.4); color:rgba(195,155,75,.6); }
 
 /* ════════════════════════════════════════════════════
    2. BANDEAU ARRIVÉE — bas gauche
@@ -109,6 +115,7 @@ html, body { width:100%; height:100%; background:transparent; overflow:hidden; }
 .bn-lbl  { font-family:'Barlow Condensed',sans-serif; font-size:11px; font-weight:700; letter-spacing:4px; text-transform:uppercase; color:rgba(68,144,200,.8); }
 .bn-name { font-family:'Barlow Condensed',sans-serif; font-size:58px; font-weight:900; line-height:1; letter-spacing:1px; color:#fff; text-transform:uppercase; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
 .bn-foot { height:4px; background:linear-gradient(to right,var(--blue3),var(--blue) 40%,rgba(45,110,168,.1)); }
+.bn-pirnum { width:34px; height:34px; border-radius:50%; border:2px solid rgba(68,144,200,.7); background:rgba(68,144,200,.1); display:flex; align-items:center; justify-content:center; font-family:'Barlow Condensed',sans-serif; font-size:16px; font-weight:900; color:var(--blue3); letter-spacing:0; }
 
 /* ════════════════════════════════════════════════════
    3. BANDEAU EN COURSE — bas, pleine largeur
@@ -153,6 +160,7 @@ html, body { width:100%; height:100%; background:transparent; overflow:hidden; }
   color:rgba(68,144,200,.75); white-space:nowrap;
 }
 .bc-sep { width:1px; height:30px; background:rgba(45,110,168,.3); }
+.bc-pirnum { width:42px; height:42px; border-radius:50%; border:2px solid rgba(68,144,200,.6); background:rgba(68,144,200,.1); display:flex; align-items:center; justify-content:center; font-family:'Barlow Condensed',sans-serif; font-size:19px; font-weight:900; color:var(--blue3); letter-spacing:0; flex-shrink:0; }
 .bc-right { margin-left:auto; display:flex; align-items:center; gap:16px; }
 .bc-logo-wrap { display:flex; align-items:center; gap:6px; opacity:.5; }
 .bc-foot { position:absolute; bottom:0; left:0; right:0; height:2px; background:linear-gradient(to right,var(--blue3),var(--blue) 30%,rgba(45,110,168,.1)); }

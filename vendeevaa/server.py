@@ -24,9 +24,9 @@ SAVE_FILE  = DATA_DIR / "data.json"
 # ─── État par défaut ──────────────────────────────────
 DEFAULT_STATE = {
     "races": {
-        "medium":  {"name": "Medium",           "displayName": "Parcours M", "distance": "", "teams": [], "ranking": []},
-        "large":   {"name": "Large",            "displayName": "Parcours L", "distance": "", "teams": [], "ranking": []},
-        "selectif":{"name": "Sélectif National","displayName": "Sélectif",  "distance": "", "teams": [], "ranking": [], "enabled": False},
+        "medium":  {"name": "Medium",           "displayName": "Parcours M", "distance": "", "teams": [], "ranking": [], "teamNumbers": {}},
+        "large":   {"name": "Large",            "displayName": "Parcours L", "distance": "", "teams": [], "ranking": [], "teamNumbers": {}},
+        "selectif":{"name": "Sélectif National","displayName": "Sélectif",  "distance": "", "teams": [], "ranking": [], "teamNumbers": {}, "enabled": False},
     },
     "overlay": {
         "mode":    "hidden",   # hidden|classement|arrivee|bandeau_course|partenaires
@@ -167,6 +167,16 @@ async def ws_handler(websocket):
                 name = msg.get("name", "")
                 if race_id in state["races"] and name in state["races"][race_id]["ranking"]:
                     state["races"][race_id]["ranking"].remove(name)
+                    await broadcast_state()
+
+            elif t == "set_team_number":
+                name   = msg.get("name", "")
+                number = str(msg.get("number", "")).strip()
+                if race_id in state["races"] and name in state["races"][race_id]["teams"]:
+                    r = state["races"][race_id]
+                    if "teamNumbers" not in r:
+                        r["teamNumbers"] = {}
+                    r["teamNumbers"][name] = number
                     await broadcast_state()
 
             # ── Config course ─────────────────────────

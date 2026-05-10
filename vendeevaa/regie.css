@@ -89,6 +89,9 @@ body { background:var(--deep); color:var(--white); font-family:'Barlow',sans-ser
 @keyframes fi { from{opacity:0;transform:translateY(-3px)} to{opacity:1;transform:translateY(0)} }
 .chip-pos { width:26px; height:26px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-family:'Barlow Condensed',sans-serif; font-size:11px; font-weight:800; background:rgba(45,110,168,.1); border:1px solid rgba(45,110,168,.22); color:rgba(122,160,192,.5); flex-shrink:0; }
 .chip-pos.ranked { background:rgba(68,144,200,.18); border-color:var(--blue3); color:var(--blue3); }
+.chip-num-inp { width:36px; background:rgba(45,110,168,.07); border:1px solid rgba(45,110,168,.2); border-radius:4px; color:var(--blue3); font-family:'Barlow Condensed',sans-serif; font-size:13px; font-weight:800; text-align:center; padding:3px 2px; outline:none; flex-shrink:0; }
+.chip-num-inp::placeholder { color:rgba(122,160,192,.22); }
+.chip-num-inp:focus { border-color:var(--blue3); background:rgba(45,110,168,.15); }
 .chip-name { flex:1; font-family:'Barlow Condensed',sans-serif; font-size:16px; font-weight:700; letter-spacing:.3px; text-transform:uppercase; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
 .chip-label { font-family:'Barlow Condensed',sans-serif; font-size:12px; font-weight:700; letter-spacing:1px; text-transform:uppercase; color:rgba(68,144,200,.45); white-space:nowrap; }
 .icon-btn { background:transparent; border:none; cursor:pointer; border-radius:3px; width:26px; height:26px; display:flex; align-items:center; justify-content:center; font-size:13px; transition:all .12s; flex-shrink:0; }
@@ -99,24 +102,27 @@ body { background:var(--deep); color:var(--white); font-family:'Barlow',sans-ser
 .icon-btn:disabled { opacity:.12; cursor:default; }
 
 /* Rank row */
-.rank-row { display:flex; align-items:center; background:rgba(255,255,255,.03); border:1px solid var(--line); border-radius:5px; overflow:hidden; cursor:grab; user-select:none; animation:fi .18s ease; transition:border-color .14s, background .14s, box-shadow .14s; }
-.rank-row:hover { border-color:rgba(45,110,168,.32); }
+.rank-row { display:flex; align-items:center; height:58px; background:rgba(255,255,255,.025); border:1px solid var(--line); border-left:3px solid transparent; border-radius:7px; overflow:hidden; cursor:grab; user-select:none; animation:fi .18s ease; transition:border-color .15s, background .15s, box-shadow .15s; }
+.rank-row:hover { border-color:rgba(45,110,168,.4); background:rgba(45,110,168,.05); }
 .rank-row.drag-over { border-color:var(--blue3); background:rgba(45,110,168,.1); box-shadow:0 0 0 1px var(--blue3); }
 .rank-row.dragging  { opacity:.3; }
-.rr-num { width:46px; height:50px; display:flex; align-items:center; justify-content:center; font-family:'Barlow Condensed',sans-serif; font-size:22px; font-weight:900; color:rgba(255,255,255,.13); background:rgba(45,110,168,.04); border-right:1px solid var(--line); flex-shrink:0; }
-.rr-num.n1{color:var(--blue3);background:rgba(68,144,200,.1);}
-.rr-num.n2{color:rgba(68,144,200,.6);}
-.rr-num.n3{color:rgba(68,144,200,.38);}
-.rr-handle { padding:0 7px; color:rgba(122,160,192,.16); font-size:11px; cursor:grab; }
-.rr-name { flex:1; padding:0 10px; font-family:'Barlow Condensed',sans-serif; font-size:17px; font-weight:700; letter-spacing:.3px; text-transform:uppercase; color:rgba(255,255,255,.82); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
-.rr-num.n1+.rr-handle+.rr-name{color:#fff;font-size:19px;}
-.rr-arrows { display:flex; flex-direction:column; border-left:1px solid var(--line); }
-.arr-btn { background:transparent; border:none; width:30px; height:25px; display:flex; align-items:center; justify-content:center; cursor:pointer; color:var(--mist); font-size:11px; transition:background .12s,color .12s; }
-.arr-btn:hover { background:rgba(45,110,168,.2); color:#fff; }
-.arr-btn:disabled{opacity:.12;cursor:default;}
-.arr-btn+.arr-btn{border-top:1px solid var(--line);}
-.rr-del { background:transparent; border:none; border-left:1px solid var(--line); width:30px; height:50px; display:flex; align-items:center; justify-content:center; cursor:pointer; color:rgba(232,64,64,.3); font-size:14px; transition:all .12s; flex-shrink:0; }
-.rr-del:hover{background:rgba(232,64,64,.1);color:var(--red);}
+.rank-row.rr-first  { border-left-color:var(--blue3); border-color:rgba(68,144,200,.3); background:rgba(68,144,200,.06); }
+.rank-row.rr-second { border-left-color:rgba(195,215,230,.35); }
+.rank-row.rr-third  { border-left-color:rgba(195,155,75,.4); }
+.rr-num { align-self:stretch; width:54px; display:flex; align-items:center; justify-content:center; font-family:'Barlow Condensed',sans-serif; font-size:26px; font-weight:900; color:rgba(255,255,255,.1); border-right:1px solid var(--line); flex-shrink:0; }
+.rr-num.n1 { color:var(--blue3); background:rgba(68,144,200,.12); }
+.rr-num.n2 { color:rgba(195,215,230,.5); }
+.rr-num.n3 { color:rgba(195,155,75,.55); }
+.rr-handle { display:flex; align-items:center; padding:0 8px; color:rgba(122,160,192,.1); font-size:12px; letter-spacing:1px; cursor:grab; transition:color .15s; flex-shrink:0; }
+.rank-row:hover .rr-handle { color:rgba(122,160,192,.5); }
+.rr-name { flex:1; min-width:0; padding:0 8px; font-family:'Barlow Condensed',sans-serif; font-size:18px; font-weight:700; letter-spacing:.4px; text-transform:uppercase; color:rgba(255,255,255,.78); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.rr-first .rr-name { color:#fff; font-size:20px; }
+.rr-pirnum { width:30px; height:30px; border-radius:50%; border:1.5px solid rgba(68,144,200,.3); background:rgba(68,144,200,.06); display:flex; align-items:center; justify-content:center; font-family:'Barlow Condensed',sans-serif; font-size:12px; font-weight:900; color:rgba(68,144,200,.65); flex-shrink:0; margin:0 6px; }
+.rr-arrows { align-self:stretch; display:flex; flex-direction:column; border-left:1px solid var(--line); flex-shrink:0; }
+.arr-btn { flex:1; background:transparent; border:none; width:32px; display:flex; align-items:center; justify-content:center; cursor:pointer; color:rgba(122,160,192,.3); font-size:10px; transition:background .12s,color .12s; }
+.arr-btn:hover { background:rgba(45,110,168,.22); color:#fff; }
+.arr-btn:disabled { opacity:.1; cursor:default; }
+.arr-btn+.arr-btn { border-top:1px solid var(--line); }
 
 /* ─ BIG BUTTONS ─ */
 .big-btn { width:100%; border:none; border-radius:7px; cursor:pointer; padding:14px 16px; display:flex; flex-direction:column; align-items:flex-start; text-align:left; transition:all .17s; position:relative; overflow:hidden; margin-bottom:8px; }

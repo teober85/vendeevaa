@@ -48,7 +48,10 @@
       <div class="bn-suf" id="bnSuf">ÈRE PLACE</div>
     </div>
     <div class="bn-team">
-      <div class="bn-lbl">Pirogue</div>
+      <div style="display:flex;align-items:center;gap:10px">
+        <div class="bn-lbl">Pirogue</div>
+        <div class="bn-pirnum" id="bnPirNum" style="display:none"></div>
+      </div>
       <div class="bn-name" id="bnName">—</div>
     </div>
   </div>
@@ -65,6 +68,7 @@
       <div class="bc-body" style="background:transparent;border:none;padding:0;position:static;overflow:visible;display:flex;align-items:center;gap:20px;flex:1;">
         <div class="bc-tag">Pirogue</div>
         <div class="bc-sep"></div>
+        <div class="bc-pirnum" id="bcPirNum" style="display:none"></div>
         <div class="bc-team" id="bcTeam">—</div>
         <div class="bc-right">
           <div class="bc-logo-wrap">
@@ -131,16 +135,22 @@ function hideAll() {
 function ordinal(n) { return n===1?'1re':n+'e'; }
 function rowGrade(i){ return i<=2?' r'+(i+1):''; }
 
-function renderClassement(ranking) {
+function renderClassement(ranking, teamNumbers) {
+  const nums = teamNumbers || {};
   const rows = document.getElementById('lbRows');
-  // Exit actuels
   rows.querySelectorAll('.lb-row.in').forEach(r => r.classList.replace('in','out'));
   setTimeout(() => {
-    rows.innerHTML = ranking.map((name,i) => `
-      <div class="lb-row${rowGrade(i)}" data-r>
-        <div class="lb-rank">${i+1}</div>
-        <div class="lb-name">${name.toUpperCase()}</div>
-      </div>`).join('');
+    rows.innerHTML = ranking.map((name,i) => {
+      const num = nums[name] || '';
+      return `
+        <div class="lb-row${rowGrade(i)}" data-r>
+          <div class="lb-rank">${i+1}</div>
+          <div class="lb-name-wrap">
+            <div class="lb-name">${name.toUpperCase()}</div>
+            ${num ? `<div class="lb-num">${num}</div>` : ''}
+          </div>
+        </div>`;
+    }).join('');
     requestAnimationFrame(() => {
       rows.querySelectorAll('[data-r]').forEach((r,i) => {
         setTimeout(() => r.classList.add('in'), i*80);
@@ -164,8 +174,10 @@ function renderSponsor(sponsorName, sponsors) {
 }
 
 /* ── Bandeau course ──────────────────────────── */
-function renderBandeauCourse(teamName) {
+function renderBandeauCourse(teamName, pirNum) {
   document.getElementById('bcTeam').textContent = teamName.toUpperCase();
+  const el = document.getElementById('bcPirNum');
+  if (el) { el.textContent = pirNum||''; el.style.display = pirNum ? 'flex' : 'none'; }
 }
 
 /* ── Helpers course ──────────────────────────── */
@@ -193,22 +205,26 @@ function applyOverlay(st, state) {
     case 'classement':
       [bn,bc,sp].forEach(hide);
       document.getElementById('lbRaceName').textContent = displayName;
-      renderClassement((race.ranking)||[]);
+      renderClassement((race.ranking)||[], race.teamNumbers||{});
       show(lb);
       break;
-    case 'arrivee':
+    case 'arrivee': {
       [lb,bc,sp].forEach(hide);
       document.getElementById('bnNum').textContent  = st.place;
       document.getElementById('bnNum').className    = 'bn-num'+(st.place===1?' p1':'');
       document.getElementById('bnSuf').textContent  = st.place===1?'ÈRE PLACE':'ÈME PLACE';
       document.getElementById('bnName').textContent = (st.team||'').toUpperCase();
       document.getElementById('bnRaceLabel').textContent = displayName;
+      const pirNum = (race.teamNumbers||{})[st.team]||'';
+      const pirEl  = document.getElementById('bnPirNum');
+      pirEl.textContent = pirNum; pirEl.style.display = pirNum ? 'flex' : 'none';
       show(bn);
       break;
+    }
     case 'bandeau_course':
       [lb,bn,sp].forEach(hide);
       document.getElementById('bcRaceLabel').textContent = (displayName || 'En course').toUpperCase();
-      renderBandeauCourse(st.team||'');
+      renderBandeauCourse(st.team||'', (race.teamNumbers||{})[st.team]||'');
       show(bc);
       break;
     case 'partenaires':

@@ -90,6 +90,12 @@
     <input type="text" class="inp" id="distanceInput" placeholder="Distance (km)..." maxlength="20"/>
     <button class="btn btn-muted" onclick="saveDistance()">OK</button>
   </div>
+  <div style="padding:6px 12px 2px;flex-shrink:0"><div class="sec-lbl">Classement</div></div>
+  <div class="field">
+    <select class="sel" id="addSel"><option value="">Ajouter au classement...</option></select>
+    <button class="btn btn-blue" onclick="addToRanking()">+</button>
+  </div>
+  <div style="padding:6px 12px 2px;flex-shrink:0"><div class="sec-lbl">Pirogues</div></div>
   <div class="field">
     <input type="text" class="inp" id="teamInput" placeholder="Nom de la pirogue..." maxlength="40"/>
     <button class="btn btn-blue" onclick="addTeam()">Ajouter</button>
@@ -110,10 +116,6 @@
         </div>
         <button class="btn btn-muted" onclick="toggleSettings()" id="settingsBtn">⚙ Réglages</button>
       </div>
-    </div>
-    <div class="field">
-      <select class="sel" id="addSel"><option value="">Choisir une pirogue à classer...</option></select>
-      <button class="btn btn-blue" onclick="addToRanking()">+ Classer</button>
     </div>
     <div class="col-body" id="rankList"
          ondragover="onDragOver(event)" ondrop="onDrop(event)">
@@ -586,39 +588,60 @@ function renderAll(){
 }
 
 function renderTeamPool(){
-  const race=races[currentRace]||{teams:[],ranking:[]};
+  const race=races[currentRace]||{teams:[],ranking:[],teamNumbers:{}};
+  const nums=race.teamNumbers||{};
   const el=document.getElementById('teamPool');
+  const as=document.getElementById('addSel');
+  as.innerHTML='<option value="">Ajouter au classement...</option>'
+    +race.teams.filter(t=>!race.ranking.includes(t)).map(t=>`<option value="${esc(t)}">${t}</option>`).join('');
   el.innerHTML=race.teams.length?race.teams.map(t=>{
     const pos=race.ranking.indexOf(t), inR=pos>=0;
+    const num=nums[t]||'';
     return `<div class="chip">
       <div class="chip-pos ${inR?'ranked':''}">${inR?pos+1:'—'}</div>
+      <input class="chip-num-inp" type="text" value="${esc(num)}" placeholder="#" maxlength="4"
+             title="Numéro de dossard"
+             onchange="setTeamNumber('${esc(t)}',this.value)"
+             onkeydown="if(event.key==='Enter')this.blur()"
+             onclick="event.stopPropagation()">
       <div class="chip-name">${t}</div>
-      ${inR?`<span class="chip-label">${pos+1}${pos===0?'re':'e'}</span>`:''}
-      <button class="icon-btn del" onclick="removeTeam('${esc(t)}')" title="Supprimer">✕</button>
+      ${inR
+        ? `<button class="icon-btn" onclick="removeFromRanking('${esc(t)}')" title="Retirer du classement" style="color:rgba(232,64,64,.5);font-size:15px">↩</button>`
+        : `<button class="icon-btn action" onclick="addToRankingDirect('${esc(t)}')" title="Classer" style="font-size:17px;font-weight:900;line-height:1">+</button>`}
+      <button class="icon-btn del" onclick="removeTeam('${esc(t)}')" title="Supprimer de la liste">✕</button>
     </div>`;
   }).join(''):'<div class="empty">Aucune pirogue enregistrée</div>';
 }
 
-function renderRankList(){
-  const race=races[currentRace]||{teams:[],ranking:[]};
-  const el=document.getElementById('rankList');
-  const as=document.getElementById('addSel');
-  as.innerHTML='<option value="">Choisir une pirogue à classer...</option>'
-    +race.teams.filter(t=>!race.ranking.includes(t)).map(t=>`<option value="${esc(t)}">${t}</option>`).join('');
+function setTeamNumber(name, val){
+  send({type:'set_team_number', race:currentRace, name, number:val.trim()});
+}
 
-  el.innerHTML=race.ranking.length?race.ranking.map((t,i)=>`
-    <div class="rank-row" data-idx="${i}" draggable="true"
+function addToRankingDirect(name){
+  send({type:'add_to_ranking',race:currentRace,name});
+}
+
+function renderRankList(){
+  const race=races[currentRace]||{teams:[],ranking:[],teamNumbers:{}};
+  const nums=race.teamNumbers||{};
+  const el=document.getElementById('rankList');
+  const rc=i=>i===0?'rr-first':i===1?'rr-second':i===2?'rr-third':'';
+  el.innerHTML=race.ranking.length?race.ranking.map((t,i)=>{
+    const num=nums[t]||'';
+    return `
+    <div class="rank-row ${rc(i)}" data-idx="${i}" draggable="true"
          ondragstart="onDragStart(event,${i})" ondragend="onDragEnd(event)"
          ondragover="onDragOver(event)" ondrop="onDrop(event)">
       <div class="rr-num ${nc(i)}">${i+1}</div>
       <div class="rr-handle">⋮⋮</div>
       <div class="rr-name">${t}</div>
+      ${num?`<div class="rr-pirnum">${num}</div>`:''}
       <div class="rr-arrows">
         <button class="arr-btn" onclick="moveUp(${i})" ${i===0?'disabled':''}>▲</button>
         <button class="arr-btn" onclick="moveDown(${i})" ${i===race.ranking.length-1?'disabled':''}>▼</button>
       </div>
-      <button class="rr-del" onclick="removeFromRanking('${esc(t)}')" title="Retirer">✕</button>
-    </div>`).join(''):'<div class="empty">Aucune pirogue classée</div>';
+    </div>`;
+  }).join(''):'<div class="empty">Aucune pirogue classée</div>';
 }
 
 function renderCourseList(){
@@ -671,7 +694,10 @@ function renderSponsors(){
 function renderBannerSelects(){
   const race=races[currentRace]||{teams:[],ranking:[]};
   const bt=document.getElementById('bnTeam'), bv=bt.value;
-  bt.innerHTML='<option value="">Pirogue...</option>'+race.teams.map(t=>`<option value="${esc(t)}" ${bv===t?'selected':''}>${t}</option>`).join('');
+  const ranked=race.ranking.filter(t=>race.teams.includes(t));
+  const unranked=race.teams.filter(t=>!race.ranking.includes(t));
+  bt.innerHTML='<option value="">Pirogue...</option>'
+    +[...ranked,...unranked].map(t=>`<option value="${esc(t)}" ${bv===t?'selected':''}>${t}</option>`).join('');
   if(bv)bt.value=bv;
   const pb=document.getElementById('bnPlace');
   if(pb&&!pb._manual){

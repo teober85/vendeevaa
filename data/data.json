@@ -5,7 +5,8 @@
       "displayName": "Parcours M",
       "distance": "15",
       "teams": [],
-      "ranking": []
+      "ranking": [],
+      "teamNumbers": {}
     },
     "large": {
       "name": "Large",
@@ -29,8 +30,8 @@
       "ranking": [
         "MOANA MANU NUI",
         "THE LOVEBOAT",
-        "TE RANA TANE",
         "AUKAI CANOE CLUB",
+        "TE RANA TANE",
         "TEAM HEKE MOANA CHATEL",
         "TUAKI HOE",
         "MANA O VAA",
@@ -40,7 +41,12 @@
         "UCKERDRACHEN",
         "NORD BASSIN VA A",
         "EDEN VA A"
-      ]
+      ],
+      "teamNumbers": {
+        "MOANA MANU NUI": "10",
+        "THE LOVEBOAT": "11",
+        "UCKERDRACHEN": "12"
+      }
     },
     "selectif": {
       "name": "Sélectif National",
@@ -48,6 +54,7 @@
       "distance": "",
       "teams": [],
       "ranking": [],
+      "teamNumbers": {},
       "enabled": false
     }
   },
