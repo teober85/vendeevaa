@@ -1,3 +1,19 @@
+function toggleTheme() {
+  const isLight = document.body.classList.toggle('light');
+  localStorage.setItem('regieTheme', isLight ? 'light' : 'dark');
+  const btn = document.getElementById('themeToggle');
+  if (btn) btn.textContent = isLight ? '☾ Sombre' : '☀ Clair';
+}
+
+function initTheme() {
+  const saved = localStorage.getItem('regieTheme');
+  if (saved === 'light') {
+    document.body.classList.add('light');
+    const btn = document.getElementById('themeToggle');
+    if (btn) btn.textContent = '☾ Sombre';
+  }
+}
+
 function switchTab(t) {
   currentTab = t;
   document.querySelectorAll('.tab').forEach(el => el.classList.remove('active'));

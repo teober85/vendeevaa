@@ -103,12 +103,13 @@
     }
   },
   "overlay": {
-    "mode": "classement",
-    "race": "large",
-    "team": "",
+    "mode": "hidden",
+    "race": "medium",
+    "team": "MAUI VAHINE",
     "place": 0,
-    "showAll": true,
-    "sponsor": ""
+    "showAll": false,
+    "sponsor": "",
+    "showRank": false
   },
   "courseName": "Jeudi",
   "sponsors": [
