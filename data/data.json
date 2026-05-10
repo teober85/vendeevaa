@@ -50,7 +50,7 @@
   },
   "overlay": {
     "mode": "hidden",
-    "race": "medium",
+    "race": "large",
     "team": "",
     "place": 0,
     "showAll": false,
