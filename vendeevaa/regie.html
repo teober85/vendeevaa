@@ -126,6 +126,10 @@
     <div class="preview-wrap">
       <div class="preview-label">Aperçu live</div>
       <iframe src="/overlay" class="preview-iframe" scrolling="no"></iframe>
+      <div class="preview-btns">
+        <button class="preview-btn" onclick="previewPopout()" title="Ouvrir dans une fenêtre">⤢</button>
+        <button class="preview-btn" onclick="previewFullscreen(this)" title="Plein écran">⛶</button>
+      </div>
     </div>
     <div class="bcast-inner">
       <div class="bcast-block">
@@ -183,29 +187,20 @@
 
   <!-- Col 2 : diffusion en course -->
   <div class="col">
-    <div class="col-head">
-      <div class="col-head-title">Diffusion OBS</div>
-      <div class="col-head-desc">Bandeau pleine largeur en bas de l'écran</div>
+    <div class="preview-wrap preview-fill">
+      <div class="preview-label">Aperçu live</div>
+      <iframe src="/overlay" class="preview-iframe" scrolling="no"></iframe>
+      <div class="preview-btns">
+        <button class="preview-btn" onclick="previewPopout()" title="Agrandir">⤢</button>
+        <button class="preview-btn" onclick="previewFullscreen(this)" title="Plein écran">⛶</button>
+      </div>
     </div>
-    <div class="bcast-inner">
-      <div class="bcast-block">
-        <div class="sec-lbl">Pirogue sélectionnée</div>
-        <div class="status-card">
-          <div class="status-line"><div class="s-dot" id="stDotCours"></div><span class="s-key">En cours</span><span class="s-val" id="stValCours">Aucune</span></div>
-        </div>
-      </div>
-      <div class="bcast-block">
-        <div class="sec-lbl">Afficher le bandeau</div>
-        <button class="big-btn bbv-teal" id="btnCours" onclick="showBandeauCours()">
-          <div class="bbt">Afficher le bandeau en course</div>
-          <div class="bbd">Présente la pirogue sélectionnée en bas de l'écran OBS</div>
-          <div class="live-flag"><div class="ldot2"></div>Bandeau en direct</div>
-        </button>
-        <button class="big-btn bbv-red" onclick="hideAll()" style="margin-top:8px">
-          <div class="bbt">Masquer</div>
-          <div class="bbd">Retire le bandeau de l'écran</div>
-        </button>
-      </div>
+    <div class="preview-controls">
+      <div class="s-dot" id="stDotCours"></div>
+      <span class="s-key">En cours :</span>
+      <span class="s-val" id="stValCours" style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Aucune</span>
+      <button class="btn btn-blue" id="btnCours" onclick="showBandeauCours()" style="white-space:nowrap">Diffuser</button>
+      <button class="btn btn-muted" onclick="hideAll()" style="white-space:nowrap">Masquer</button>
     </div>
   </div>
 
@@ -232,6 +227,14 @@
 
   <!-- Col 2 : diffusion -->
   <div class="col">
+    <div class="preview-wrap">
+      <div class="preview-label">Aperçu live</div>
+      <iframe src="/overlay" class="preview-iframe" scrolling="no"></iframe>
+      <div class="preview-btns">
+        <button class="preview-btn" onclick="previewPopout()" title="Ouvrir dans une fenêtre">⤢</button>
+        <button class="preview-btn" onclick="previewFullscreen(this)" title="Plein écran">⛶</button>
+      </div>
+    </div>
     <div class="col-head">
       <div class="col-head-title">Diffusion OBS</div>
       <div class="col-head-desc">Sélectionnez puis diffusez</div>
@@ -304,6 +307,14 @@
 
 <!-- Hidden file input pour photos -->
 <input type="file" id="fileInput" accept="image/*" style="display:none"/>
+
+<!-- MODAL PREVIEW -->
+<div class="preview-modal" id="previewModal" onclick="closePreviewModal(event)">
+  <div class="preview-modal-box">
+    <button class="preview-modal-close" onclick="closePreviewModal()" title="Fermer">✕</button>
+    <iframe src="/overlay" class="preview-modal-iframe" scrolling="no"></iframe>
+  </div>
+</div>
 
 <div class="toast" id="toast"></div>
 
@@ -676,6 +687,17 @@ function renderBannerSelects(){
 }
 
 function copyObs(){ navigator.clipboard.writeText('http://localhost:8765/overlay').then(()=>toast('URL OBS copiée')); }
+function previewPopout(){ document.getElementById('previewModal').classList.add('open'); }
+function closePreviewModal(e){
+  const modal=document.getElementById('previewModal');
+  if(!e || e.target===modal) modal.classList.remove('open');
+}
+function previewFullscreen(btn){
+  const wrap=btn.closest('.preview-wrap');
+  if(!document.fullscreenElement){ wrap.requestFullscreen().catch(()=>{}); }
+  else { document.exitFullscreen(); }
+}
+document.addEventListener('keydown',e=>{ if(e.key==='Escape') closePreviewModal(); });
 
 function toast(msg){
   const el=document.getElementById('toast');

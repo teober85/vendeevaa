@@ -3,14 +3,14 @@
     "medium": {
       "name": "Medium",
       "displayName": "Parcours M",
-      "distance": "",
+      "distance": "15",
       "teams": [],
       "ranking": []
     },
     "large": {
       "name": "Large",
       "displayName": "Parcours L",
-      "distance": "",
+      "distance": "46",
       "teams": [
         "MOANA MANU NUI",
         "THE LOVEBOAT",
@@ -52,11 +52,11 @@
     }
   },
   "overlay": {
-    "mode": "hidden",
+    "mode": "classement",
     "race": "large",
-    "team": "MOANA MANU NUI",
+    "team": "",
     "place": 0,
-    "showAll": false,
+    "showAll": true,
     "sponsor": ""
   },
   "sponsors": [
