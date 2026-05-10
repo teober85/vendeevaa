@@ -39,9 +39,6 @@
   <div class="tab" onclick="switchTab('encours')" id="tab-encours">
     <div class="tab-dot"></div>En course
   </div>
-  <div class="tab" onclick="switchTab('partenaires')" id="tab-partenaires">
-    Partenaires
-  </div>
   <div class="tab" onclick="switchTab('titrage')" id="tab-titrage">
     <div class="tab-dot"></div>Titrage
   </div>
@@ -245,52 +242,6 @@
 </div><!-- /panel-encours -->
 
 <!-- ════════════════════════════════════════════
-  ONGLET 3 — PARTENAIRES
-════════════════════════════════════════════ -->
-<div class="tab-panel" id="panel-partenaires">
-<div class="two-col" style="grid-template-columns:1fr auto">
-
-  <!-- Col 1 : liste sponsors -->
-  <div class="col">
-    <div class="col-head">
-      <div class="col-head-title">Partenaires</div>
-      <div class="col-head-desc">Logos et descriptions chargés depuis votre PC</div>
-    </div>
-    <div style="padding:10px 12px;border-bottom:1px solid var(--line);flex-shrink:0">
-      <button class="btn btn-blue" onclick="addSponsor()">+ Ajouter un partenaire</button>
-    </div>
-    <div class="col-body" id="sponsorsList"><div class="empty">Aucun partenaire</div></div>
-  </div>
-
-  <!-- Col 2 : diffusion -->
-  <div class="col ob-col">
-    <div class="preview-wrap">
-      <div class="preview-label">Aperçu live</div>
-      <iframe src="/overlay" class="preview-iframe" scrolling="no"></iframe>
-      <div class="preview-btns">
-        <button class="preview-btn" onclick="previewPopout()" title="Agrandir">⤢</button>
-        <button class="preview-btn" onclick="previewFullscreen(this)" title="Plein écran">⛶</button>
-      </div>
-    </div>
-    <div class="ob-panel">
-      <div class="ob-status">
-        <div class="ob-dot" id="stDotSp"></div>
-        <span class="ob-status-txt" id="stValSp">Aucun</span>
-      </div>
-      <div class="ob-action">
-        <select class="sel" id="selSponsor" style="width:100%;margin-bottom:8px"><option value="">Partenaire à afficher...</option></select>
-        <button class="ob-btn ob-purple" id="btnSp" onclick="showSponsor()">Diffuser</button>
-      </div>
-      <div class="ob-action">
-        <button class="ob-btn ob-red" onclick="hideAll()">Masquer</button>
-      </div>
-    </div>
-  </div>
-
-</div>
-</div><!-- /panel-partenaires -->
-
-<!-- ════════════════════════════════════════════
   ONGLET — TITRAGE
 ════════════════════════════════════════════ -->
 <div class="tab-panel" id="panel-titrage">
@@ -412,7 +363,6 @@
       <div class="sc-row"><div class="sc-keys"><kbd>A</kbd></div><span>Bandeau arrivée (pirogue sélectionnée)</span></div>
       <div class="sc-row"><div class="sc-keys"><kbd>E</kbd></div><span>Bandeau en cours (pirogue sélectionnée)</span></div>
       <div class="sc-row"><div class="sc-keys"><kbd>Entrée</kbd></div><span>Diffuser (onglets Classement &amp; En course)</span></div>
-      <div class="sc-row"><div class="sc-keys"><kbd>P</kbd></div><span>Diffuser le partenaire sélectionné</span></div>
       <div class="sc-row"><div class="sc-keys"><kbd>Suppr</kbd></div><span>Masquer l'overlay</span></div>
       <div class="sc-row"><div class="sc-keys"><kbd>Échap</kbd></div><span>Masquer l'overlay / fermer</span></div>
       <div class="sc-group">Navigation courses</div>
@@ -433,7 +383,6 @@
 <script src="/js/render.js"></script>
 <script src="/js/teams.js"></script>
 <script src="/js/broadcast.js"></script>
-<script src="/js/sponsors.js"></script>
 <script src="/js/titrages.js"></script>
 <script src="/js/colorpicker.js"></script>
 <script src="/js/ui.js"></script>

@@ -45,14 +45,6 @@ function syncRankToggle() {
   btn.className   = showCourseRank ? 'btn btn-blue' : 'btn btn-muted';
 }
 
-function showSponsor() {
-  const sp = document.getElementById('selSponsor').value;
-  if (!sp) { toast('Sélectionnez un partenaire'); return; }
-  if (overlay.mode === 'partenaires' && overlay.sponsor === sp) { hideAll(); return; }
-  send({ type: 'show_sponsor', sponsor: sp });
-  toast('Partenaire : ' + sp);
-}
-
 function hideAll() { send({ type: 'hide' }); toast('Overlay masqué'); }
 
 function selectPirogueEnCours(name, race) {
@@ -64,18 +56,16 @@ function selectPirogueEnCours(name, race) {
 
 function syncUI() {
   const ov = overlay;
-  ['btnC', 'btnB', 'btnCours', 'btnSp'].forEach(id => {
+  ['btnC', 'btnB', 'btnCours'].forEach(id => {
     const el = document.getElementById(id); if (el) el.classList.remove('live-on');
   });
-  ['stDotC', 'stDotCours', 'stDotSp'].forEach(id => {
+  ['stDotC', 'stDotCours'].forEach(id => {
     const el = document.getElementById(id); if (el) el.classList.remove('on');
   });
 
-  const stC    = document.getElementById('stValC');
-  const stSp   = document.getElementById('stValSp');
+  const stC     = document.getElementById('stValC');
   const stCours = document.getElementById('stValCours');
-  if (stC)    { stC.textContent    = 'Masqué'; stC.classList.remove('live'); }
-  if (stSp)   { stSp.textContent   = 'Aucun';  stSp.classList.remove('live'); }
+  if (stC)    { stC.textContent = 'Masqué'; stC.classList.remove('live'); }
   if (stCours) stCours.classList.remove('live');
   document.querySelectorAll('.tab,.race-tab').forEach(el => el.classList.remove('live'));
 
@@ -101,10 +91,6 @@ function syncUI() {
     if (crtab) crtab.classList.add('live');
     showCourseRank = !!(ov.showRank);
     syncRankToggle();
-  } else if (ov.mode === 'partenaires') {
-    act('btnSp', 'stDotSp');
-    if (stSp) { stSp.textContent = ov.sponsor || '—'; stSp.classList.add('live'); }
-    document.getElementById('tab-partenaires').classList.add('live');
   }
 }
 

@@ -78,23 +78,7 @@
   </div>
 </div>
 
-<!-- 4. PARTENAIRE -->
-<div id="sponsor-card">
-  <div class="sp-head">
-    <span class="sp-lbl">Partenaire</span>
-    <span class="sp-name" id="spName">—</span>
-  </div>
-  <div class="sp-body">
-    <div class="sp-logo-wrap" id="spLogoWrap"></div>
-    <div class="sp-desc" id="spDesc"></div>
-  </div>
-  <div class="sp-foot">
-    <div class="ldot"></div>
-    <span class="sp-foot-txt">Vendée Va'a — Les Sables d'Olonne</span>
-  </div>
-</div>
-
-<!-- 5. TITRAGE -->
+<!-- 4. TITRAGE -->
 <div id="titrage">
   <div class="tit-stripe"></div>
   <div class="tit-body">
@@ -128,7 +112,7 @@ function hide(el) {
   }, 700);
 }
 function hideAll() {
-  ['leaderboard','banner','bandeau-course','sponsor-card']
+  ['leaderboard','banner','bandeau-course']
     .forEach(id => hide(document.getElementById(id)));
 }
 
@@ -176,20 +160,6 @@ function renderClassement(ranking, teamNumbers, raceStatus) {
   }, 200);
 }
 
-/* ── Sponsor ─────────────────────────────────── */
-function renderSponsor(sponsorName, sponsors) {
-  const sp = sponsors.find(s => s.nom === sponsorName) || sponsors[0];
-  if (!sp) return;
-  document.getElementById('spName').textContent = sp.nom||'';
-  document.getElementById('spDesc').textContent = sp.description||'';
-  const lw = document.getElementById('spLogoWrap');
-  if (sp.logo_b64) {
-    lw.innerHTML = `<img class="sp-logo" src="${sp.logo_b64}" alt="${sp.nom}"/>`;
-  } else {
-    lw.innerHTML = `<div style="font-family:'Barlow Condensed',sans-serif;font-size:22px;font-weight:700;letter-spacing:2px;color:rgba(255,255,255,.25);text-transform:uppercase;">${sp.nom}</div>`;
-  }
-}
-
 /* ── Bandeau course ──────────────────────────── */
 function renderBandeauCourse(teamName, pirNum, raceLabel, rank, showRank) {
   document.getElementById('bcTeam').textContent = teamName.toUpperCase();
@@ -220,9 +190,8 @@ function applyOverlay(st, state) {
   const lb = document.getElementById('leaderboard');
   const bn = document.getElementById('banner');
   const bc = document.getElementById('bandeau-course');
-  const sp = document.getElementById('sponsor-card');
 
-  const all = [lb,bn,bc,sp];
+  const all = [lb,bn,bc];
 
   if (!st.mode || st.mode==='hidden') {
     all.forEach(hide); return;
@@ -236,13 +205,13 @@ function applyOverlay(st, state) {
 
   switch(st.mode) {
     case 'classement':
-      [bn,bc,sp].forEach(hide);
+      [bn,bc].forEach(hide);
       document.getElementById('lbRaceName').textContent = [cName, raceLabel].filter(Boolean).join('  ·  ');
       renderClassement((race.ranking)||[], race.teamNumbers||{}, race.raceStatus||{});
       show(lb);
       break;
     case 'arrivee': {
-      [lb,bc,sp].forEach(hide);
+      [lb,bc].forEach(hide);
       document.getElementById('bnNum').textContent  = st.place;
       document.getElementById('bnNum').className    = 'bn-num'+(st.place===1?' p1':'');
       document.getElementById('bnSuf').textContent  = st.place===1?'ÈRE PLACE':'ÈME PLACE';
@@ -255,7 +224,7 @@ function applyOverlay(st, state) {
       break;
     }
     case 'bandeau_course': {
-      [lb,bn,sp].forEach(hide);
+      [lb,bn].forEach(hide);
       const dist2 = race.distance ? ' · ' + race.distance + ' km' : '';
       const raceLabel = (race.displayName || race.name || '') + dist2;
       const pirNum2 = (race.teamNumbers||{})[st.team]||'';
@@ -264,11 +233,6 @@ function applyOverlay(st, state) {
       show(bc);
       break;
     }
-    case 'partenaires':
-      [lb,bn,bc].forEach(hide);
-      renderSponsor(st.sponsor||'', state.sponsors||[]);
-      show(sp);
-      break;
   }
 }
 
@@ -312,8 +276,6 @@ function overlayDigest(msg) {
     return JSON.stringify({ ...base, teamNumbers: race.teamNumbers, displayName: race.displayName, distance: race.distance });
   if (mode === 'bandeau_course')
     return JSON.stringify({ ...base, teamNumbers: race.teamNumbers, displayName: race.displayName, distance: race.distance, ranking: race.ranking });
-  if (mode === 'partenaires')
-    return JSON.stringify({ ov, sponsors: msg.sponsors });
   return JSON.stringify(ov);
 }
 

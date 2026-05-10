@@ -37,8 +37,6 @@ document.addEventListener('keydown', e => {
       e.preventDefault(); showBanner(); break;
     case 'e': case 'E':
       e.preventDefault(); showBandeauCours(); break;
-    case 'p': case 'P':
-      e.preventDefault(); showSponsor(); break;
     case '1':
       e.preventDefault(); switchRace('medium'); break;
     case '2':
