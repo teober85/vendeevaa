@@ -50,7 +50,7 @@ body { background:var(--deep); color:var(--white); font-family:'Barlow',sans-ser
 .two-col { display:grid; grid-template-columns:270px 1fr; overflow:hidden; flex:1; }
 .three-col { display:grid; grid-template-columns:260px 1fr 300px; overflow:hidden; flex:1; }
 
-.col { display:flex; flex-direction:column; border-right:1px solid var(--line); overflow:hidden; }
+.col { display:flex; flex-direction:column; border-right:1px solid var(--line); overflow:hidden; min-height:0; }
 .col:last-child { border-right:none; }
 .col-head { padding:13px 15px 11px; border-bottom:1px solid var(--line); background:rgba(45,110,168,.04); flex-shrink:0; }
 .col-head-title { font-family:'Barlow Condensed',sans-serif; font-size:12px; font-weight:800; letter-spacing:3px; text-transform:uppercase; color:var(--mist); margin-bottom:3px; }
@@ -194,7 +194,7 @@ body { background:var(--deep); color:var(--white); font-family:'Barlow',sans-ser
 .preview-btn:hover { background:rgba(45,110,168,.7); border-color:rgba(68,144,200,.6); color:#fff; }
 .preview-wrap:fullscreen { width:100vw; height:100vh; aspect-ratio:unset; border:none; }
 /* Barre de contrôles compacte sous la preview (En cours) */
-.preview-controls { flex-shrink:0; padding:10px 14px; border-top:1px solid var(--line); display:flex; align-items:center; gap:10px; background:rgba(45,110,168,.03); }
+.preview-controls { flex:0 0 auto; padding:5px 10px; border-top:1px solid var(--line); display:flex; align-items:center; gap:10px; background:rgba(45,110,168,.03); }
 
 /* ─ PREVIEW MODAL ─ */
 .preview-modal { position:fixed; inset:0; background:rgba(0,0,0,.88); z-index:9000; display:none; align-items:center; justify-content:center; }
@@ -241,9 +241,9 @@ body { background:var(--deep); color:var(--white); font-family:'Barlow',sans-ser
 /* ─ OB PANEL (broadcast column compact) ─ */
 .ob-col { flex:1; min-width:220px; }
 /* Preview maintient le ratio 16:9 mais capée à 35 vh pour laisser la place aux boutons */
-.ob-col .preview-wrap { aspect-ratio:16/9; max-height:35vh; flex-shrink:0; }
-/* ob-panel remplit toute la hauteur restante ; sections distribuées uniformément */
-.ob-panel { flex:1; display:flex; flex-direction:column; min-height:0; }
+.ob-col .preview-wrap { flex:1; aspect-ratio:unset; min-height:0; }
+/* ob-panel taille fixe (contenu) ; la preview prend tout le reste */
+.ob-panel { flex:0 0 auto; display:flex; flex-direction:column; }
 .ob-status { display:flex; align-items:center; gap:9px; padding:10px 14px; border-bottom:1px solid var(--line); background:rgba(45,110,168,.04); flex-shrink:0; min-height:44px; }
 .ob-dot { width:9px; height:9px; border-radius:50%; background:rgba(122,160,192,.18); flex-shrink:0; transition:background .3s, box-shadow .3s; }
 .ob-dot.on { background:var(--green); box-shadow:0 0 8px rgba(46,204,113,.55); animation:bl 1.4s infinite; }
