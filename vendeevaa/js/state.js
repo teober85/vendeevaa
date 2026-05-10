@@ -11,3 +11,5 @@ let overlayColors = { ...DEFAULT_COLORS };
 let cpTarget = 'primary';
 let cpHSV = { h: 210, s: 0.73, v: 0.66 };
 let cpDragging = null;
+let currentCourseRace = 'medium';
+let showCourseRank = false;

@@ -1,6 +1,7 @@
 connect();
 initColorPicker();
 initSplit();
+initCourseSplit();
 
 document.getElementById('teamInput').addEventListener('keydown',      e => { if (e.key === 'Enter') addTeam(); });
 document.getElementById('courseNameInput').addEventListener('keydown', e => { if (e.key === 'Enter') saveCourseName(); });

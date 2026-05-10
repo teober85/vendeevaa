@@ -63,25 +63,15 @@
 <div id="bandeau-course">
   <div class="bc-wrap">
     <div class="bc-label">
-      <span class="bc-label-txt" id="bcRaceLabel">En course</span>
+      <span class="bc-label-txt">En course</span>
     </div>
     <div class="bc-body">
-      <div class="bc-body" style="background:transparent;border:none;padding:0;position:static;overflow:visible;display:flex;align-items:center;gap:20px;flex:1;">
-        <div class="bc-tag">Pirogue</div>
-        <div class="bc-sep"></div>
-        <div class="bc-pirnum" id="bcPirNum" style="display:none"></div>
+      <div class="bc-info" id="bcInfo"></div>
+      <div class="bc-sep" id="bcSep"></div>
+      <div class="bc-team-group">
+        <div class="bc-rank" id="bcRank"></div>
         <div class="bc-team" id="bcTeam">—</div>
-        <div class="bc-right">
-          <div class="bc-logo-wrap">
-            <svg width="80" height="22" viewBox="0 0 210 32" xmlns="http://www.w3.org/2000/svg" fill="none">
-              <path d="M2 12 C6 8 10 8 14 12 C18 16 22 16 26 12" stroke="#4490c8" stroke-width="2" stroke-linecap="round"/>
-              <path d="M2 18 C6 14 10 14 14 18 C18 22 22 22 26 18" stroke="#4490c8" stroke-width="2" stroke-linecap="round"/>
-              <text x="31" y="20" font-family="Georgia,serif" font-size="17" font-weight="700" fill="#4490c8" font-style="italic">Vendée Va'a</text>
-              <path d="M172 12 C176 8 180 8 184 12 C188 16 192 16 196 12" stroke="#4490c8" stroke-width="2" stroke-linecap="round"/>
-              <path d="M172 18 C176 14 180 14 184 18 C188 22 192 22 196 18" stroke="#4490c8" stroke-width="2" stroke-linecap="round"/>
-            </svg>
-          </div>
-        </div>
+        <div class="bc-pirnum" id="bcPirNum" style="display:none"></div>
       </div>
       <div class="bc-foot"></div>
     </div>
@@ -177,10 +167,23 @@ function renderSponsor(sponsorName, sponsors) {
 }
 
 /* ── Bandeau course ──────────────────────────── */
-function renderBandeauCourse(teamName, pirNum) {
+function renderBandeauCourse(teamName, pirNum, raceLabel, rank, showRank) {
   document.getElementById('bcTeam').textContent = teamName.toUpperCase();
-  const el = document.getElementById('bcPirNum');
-  if (el) { el.textContent = pirNum||''; el.style.display = pirNum ? 'flex' : 'none'; }
+
+  const pirEl = document.getElementById('bcPirNum');
+  if (pirEl) { pirEl.textContent = pirNum||''; pirEl.style.display = pirNum ? 'flex' : 'none'; }
+
+  const infoEl = document.getElementById('bcInfo');
+  if (infoEl) infoEl.textContent = raceLabel || '';
+
+  const sepEl = document.getElementById('bcSep');
+  if (sepEl) sepEl.style.display = raceLabel ? 'block' : 'none';
+
+  const rankEl = document.getElementById('bcRank');
+  if (rankEl) {
+    rankEl.textContent = rank > 0 ? rank : '';
+    rankEl.style.display = (showRank && rank > 0) ? 'flex' : 'none';
+  }
 }
 
 /* ── Helpers course ──────────────────────────── */
@@ -227,12 +230,16 @@ function applyOverlay(st, state) {
       show(bn);
       break;
     }
-    case 'bandeau_course':
+    case 'bandeau_course': {
       [lb,bn,sp].forEach(hide);
-      document.getElementById('bcRaceLabel').textContent = (cName || displayName || 'En course');
-      renderBandeauCourse(st.team||'', (race.teamNumbers||{})[st.team]||'');
+      const dist2 = race.distance ? ' · ' + race.distance + ' km' : '';
+      const raceLabel = (race.displayName || race.name || '') + dist2;
+      const pirNum2 = (race.teamNumbers||{})[st.team]||'';
+      const rankIdx = (race.ranking||[]).indexOf(st.team);
+      renderBandeauCourse(st.team||'', pirNum2, raceLabel, rankIdx >= 0 ? rankIdx + 1 : 0, !!st.showRank);
       show(bc);
       break;
+    }
     case 'partenaires':
       [lb,bn,bc].forEach(hide);
       renderSponsor(st.sponsor||'', state.sponsors||[]);
@@ -279,7 +286,7 @@ function overlayDigest(msg) {
   if (mode === 'arrivee')
     return JSON.stringify({ ...base, teamNumbers: race.teamNumbers, displayName: race.displayName, distance: race.distance });
   if (mode === 'bandeau_course')
-    return JSON.stringify({ ...base, teamNumbers: race.teamNumbers, displayName: race.displayName });
+    return JSON.stringify({ ...base, teamNumbers: race.teamNumbers, displayName: race.displayName, distance: race.distance, ranking: race.ranking });
   if (mode === 'partenaires')
     return JSON.stringify({ ov, sponsors: msg.sponsors });
   return JSON.stringify(ov);

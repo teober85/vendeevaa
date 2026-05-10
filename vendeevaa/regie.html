@@ -175,34 +175,66 @@
   ONGLET 2 — EN COURSE
 ════════════════════════════════════════════ -->
 <div class="tab-panel" id="panel-encours">
-<div class="two-col">
+<div style="display:flex;flex:1;overflow:hidden">
 
-  <!-- Col 1 : sélection équipe -->
-  <div class="col">
-    <div class="col-head">
-      <div class="col-head-title">Sélectionner une pirogue</div>
-      <div class="col-head-desc">Bandeau "en course" en bas d'écran</div>
+  <!-- Nav courses verticale -->
+  <div class="race-nav">
+    <div class="race-tab active" onclick="switchCourseRace('medium')" id="crtab-medium">
+      <div class="tab-dot"></div>Medium
     </div>
-    <div class="col-body" id="coursePirogueList"><div class="empty">Aucune pirogue</div></div>
+    <div class="race-tab" onclick="switchCourseRace('large')" id="crtab-large">
+      <div class="tab-dot"></div>Large
+    </div>
+    <div class="race-tab" onclick="switchCourseRace('selectif')" id="crtab-selectif">
+      <div class="tab-dot"></div>Sélectif
+    </div>
   </div>
 
-  <!-- Col 2 : diffusion en course -->
-  <div class="col">
-    <div class="preview-wrap preview-fill">
-      <div class="preview-label">Aperçu live</div>
-      <iframe src="/overlay" class="preview-iframe" scrolling="no"></iframe>
-      <div class="preview-btns">
-        <button class="preview-btn" onclick="previewPopout()" title="Agrandir">⤢</button>
-        <button class="preview-btn" onclick="previewFullscreen(this)" title="Plein écran">⛶</button>
+  <!-- Split redimensionnable -->
+  <div style="display:flex;flex:1;overflow:hidden" id="courseSplitPane">
+
+    <!-- Colonne gauche : liste pirogues -->
+    <div class="col" id="courseSplitLeft" style="flex:0 0 400px;min-width:180px">
+      <div class="col-head">
+        <div class="col-head-title">Pirogues</div>
+        <div class="col-head-desc">Dans l'ordre du classement</div>
+      </div>
+      <div class="col-body" id="coursePirogueList"><div class="empty">Aucune pirogue</div></div>
+    </div>
+
+    <!-- Séparateur redimensionnable -->
+    <div class="split-handle" id="courseSplitHandle"><div class="split-grip"></div></div>
+
+    <!-- Colonne droite : aperçu + diffusion (même structure que Classement) -->
+    <div class="col ob-col">
+      <div class="preview-wrap">
+        <div class="preview-label">Aperçu live</div>
+        <iframe src="/overlay" class="preview-iframe" scrolling="no"></iframe>
+        <div class="preview-btns">
+          <button class="preview-btn" onclick="previewPopout()" title="Agrandir">⤢</button>
+          <button class="preview-btn" onclick="previewFullscreen(this)" title="Plein écran">⛶</button>
+        </div>
+      </div>
+      <div class="ob-panel">
+        <div class="ob-status">
+          <div class="ob-dot" id="stDotCours"></div>
+          <span class="ob-status-txt" id="stValCours"
+                data-selected="" data-race="medium"
+                style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Aucune</span>
+        </div>
+        <div class="ob-action">
+          <div class="cours-rank-toggle">
+            <span>Afficher rang</span>
+            <button class="btn btn-muted" id="rankToggleBtn" onclick="toggleCourseRank()">Non</button>
+          </div>
+          <button class="ob-btn ob-green" id="btnCours" onclick="showBandeauCours()">Diffuser</button>
+        </div>
+        <div class="ob-action">
+          <button class="ob-btn ob-red" onclick="hideAll()">Masquer</button>
+        </div>
       </div>
     </div>
-    <div class="preview-controls">
-      <div class="s-dot" id="stDotCours"></div>
-      <span class="s-key">En cours :</span>
-      <span class="s-val" id="stValCours" style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Aucune</span>
-      <button class="btn btn-blue" id="btnCours" onclick="showBandeauCours()" style="white-space:nowrap">Diffuser</button>
-      <button class="btn btn-muted" onclick="hideAll()" style="white-space:nowrap">Masquer</button>
-    </div>
+
   </div>
 
 </div>
@@ -319,6 +351,7 @@
       <div class="sc-row"><div class="sc-keys"><kbd>C</kbd></div><span>Afficher le classement</span></div>
       <div class="sc-row"><div class="sc-keys"><kbd>A</kbd></div><span>Bandeau arrivée (pirogue sélectionnée)</span></div>
       <div class="sc-row"><div class="sc-keys"><kbd>E</kbd></div><span>Bandeau en cours (pirogue sélectionnée)</span></div>
+      <div class="sc-row"><div class="sc-keys"><kbd>Entrée</kbd></div><span>Diffuser (onglet En course)</span></div>
       <div class="sc-row"><div class="sc-keys"><kbd>P</kbd></div><span>Diffuser le partenaire sélectionné</span></div>
       <div class="sc-row"><div class="sc-keys"><kbd>Suppr</kbd></div><span>Masquer l'overlay</span></div>
       <div class="sc-row"><div class="sc-keys"><kbd>Échap</kbd></div><span>Masquer l'overlay / fermer</span></div>

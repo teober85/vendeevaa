@@ -21,6 +21,14 @@ function switchRace(race) {
   renderTeamPool(); renderRankList(); renderBannerSelects();
 }
 
+function switchCourseRace(race) {
+  currentCourseRace = race;
+  document.querySelectorAll('#panel-encours .race-tab').forEach(el => el.classList.remove('active'));
+  const rtab = document.getElementById('crtab-' + race);
+  if (rtab) rtab.classList.add('active');
+  renderCourseList();
+}
+
 function toggleSettings() {
   document.getElementById('settingsPanel').classList.toggle('open');
 }
@@ -54,7 +62,7 @@ function updateSelectifBadge() {
   if (btn) btn.textContent = r.enabled ? 'Désactiver' : 'Activer';
 }
 
-/* ── Split pane ── */
+/* ── Split pane (Classement) ── */
 const SPLIT_KEY = 'vva-split-w';
 let splitDrag = false, splitX0 = 0, splitW0 = 0;
 
@@ -72,21 +80,56 @@ function initSplit() {
   });
 }
 
+/* ── Split pane (En course) ── */
+const COURSE_SPLIT_KEY = 'vva-course-split-w';
+let courseSplitDrag = false, courseSplitX0 = 0, courseSplitW0 = 0;
+
+function initCourseSplit() {
+  const saved = parseInt(localStorage.getItem(COURSE_SPLIT_KEY));
+  if (saved > 0) document.getElementById('courseSplitLeft').style.flex = `0 0 ${saved}px`;
+  document.getElementById('courseSplitHandle').addEventListener('mousedown', e => {
+    courseSplitDrag = true;
+    courseSplitX0   = e.clientX;
+    courseSplitW0   = document.getElementById('courseSplitLeft').getBoundingClientRect().width;
+    document.getElementById('courseSplitHandle').classList.add('active');
+    document.body.style.cursor     = 'col-resize';
+    document.body.style.userSelect = 'none';
+    e.preventDefault();
+  });
+}
+
 document.addEventListener('mousemove', e => {
-  if (!splitDrag) return;
-  const pane  = document.getElementById('splitPane');
-  const left  = document.getElementById('splitLeft');
-  const paneW = pane.getBoundingClientRect().width;
-  const newW  = Math.max(180, Math.min(paneW - 230, splitW0 + (e.clientX - splitX0)));
-  left.style.flex = `0 0 ${newW}px`;
+  if (splitDrag) {
+    const pane  = document.getElementById('splitPane');
+    const left  = document.getElementById('splitLeft');
+    const paneW = pane.getBoundingClientRect().width;
+    const newW  = Math.max(180, Math.min(paneW - 230, splitW0 + (e.clientX - splitX0)));
+    left.style.flex = `0 0 ${newW}px`;
+  }
+  if (courseSplitDrag) {
+    const pane  = document.getElementById('courseSplitPane');
+    const left  = document.getElementById('courseSplitLeft');
+    const paneW = pane.getBoundingClientRect().width;
+    const newW  = Math.max(180, Math.min(paneW - 230, courseSplitW0 + (e.clientX - courseSplitX0)));
+    left.style.flex = `0 0 ${newW}px`;
+  }
 });
 
 document.addEventListener('mouseup', () => {
-  if (!splitDrag) return;
-  splitDrag = false;
-  document.getElementById('splitHandle').classList.remove('active');
-  document.body.style.cursor     = '';
-  document.body.style.userSelect = '';
-  const w = document.getElementById('splitLeft').getBoundingClientRect().width;
-  localStorage.setItem(SPLIT_KEY, Math.round(w));
+  if (splitDrag) {
+    splitDrag = false;
+    document.getElementById('splitHandle').classList.remove('active');
+    document.body.style.cursor     = '';
+    document.body.style.userSelect = '';
+    const w = document.getElementById('splitLeft').getBoundingClientRect().width;
+    localStorage.setItem(SPLIT_KEY, Math.round(w));
+  }
+  if (courseSplitDrag) {
+    courseSplitDrag = false;
+    document.getElementById('courseSplitHandle').classList.remove('active');
+    document.body.style.cursor     = '';
+    document.body.style.userSelect = '';
+    const w = document.getElementById('courseSplitLeft').getBoundingClientRect().width;
+    localStorage.setItem(COURSE_SPLIT_KEY, Math.round(w));
+  }
 });

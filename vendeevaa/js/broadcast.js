@@ -21,10 +21,28 @@ function showBandeauCours() {
   const el   = document.getElementById('stValCours');
   const team = el.dataset.selected || '';
   const race = el.dataset.race    || 'medium';
-  if (overlay.mode === 'bandeau_course') { hideAll(); return; }
   if (!team) { toast('Sélectionnez une pirogue en cours'); return; }
-  send({ type: 'show_bandeau_course', race, team });
+  if (overlay.mode === 'bandeau_course' && overlay.team === team && overlay.race === race && !!overlay.showRank === showCourseRank) { hideAll(); return; }
+  send({ type: 'show_bandeau_course', race, team, showRank: showCourseRank });
   toast('Bandeau en cours : ' + team);
+}
+
+function toggleCourseRank() {
+  showCourseRank = !showCourseRank;
+  syncRankToggle();
+  if (overlay.mode === 'bandeau_course') {
+    const el = document.getElementById('stValCours');
+    const team = el.dataset.selected || '';
+    const race = el.dataset.race || 'medium';
+    if (team) send({ type: 'show_bandeau_course', race, team, showRank: showCourseRank });
+  }
+}
+
+function syncRankToggle() {
+  const btn = document.getElementById('rankToggleBtn');
+  if (!btn) return;
+  btn.textContent = showCourseRank ? 'Oui' : 'Non';
+  btn.className   = showCourseRank ? 'btn btn-blue' : 'btn btn-muted';
 }
 
 function showSponsor() {
@@ -39,12 +57,9 @@ function hideAll() { send({ type: 'hide' }); toast('Overlay masqué'); }
 
 function selectPirogueEnCours(name, race) {
   const el = document.getElementById('stValCours');
-  el.textContent = name; el.dataset.selected = name; el.dataset.race = race || 'medium';
-  document.querySelectorAll('.cours-item').forEach(el => {
-    const match = el.dataset.name === name && el.dataset.race === (race || 'medium');
-    el.style.borderColor = match ? 'rgba(68,144,200,.5)' : 'rgba(45,110,168,.18)';
-    el.style.background  = match ? 'rgba(68,144,200,.08)' : 'rgba(255,255,255,.025)';
-  });
+  el.dataset.selected = name; el.dataset.race = race || 'medium';
+  if (overlay.mode !== 'bandeau_course') el.textContent = name;
+  renderCourseList();
 }
 
 function syncUI() {
@@ -56,10 +71,12 @@ function syncUI() {
     const el = document.getElementById(id); if (el) el.classList.remove('on');
   });
 
-  const stC  = document.getElementById('stValC');
-  const stSp = document.getElementById('stValSp');
-  if (stC)  { stC.textContent  = 'Masqué'; stC.classList.remove('live'); }
-  if (stSp) { stSp.textContent = 'Aucun';  stSp.classList.remove('live'); }
+  const stC    = document.getElementById('stValC');
+  const stSp   = document.getElementById('stValSp');
+  const stCours = document.getElementById('stValCours');
+  if (stC)    { stC.textContent    = 'Masqué'; stC.classList.remove('live'); }
+  if (stSp)   { stSp.textContent   = 'Aucun';  stSp.classList.remove('live'); }
+  if (stCours) stCours.classList.remove('live');
   document.querySelectorAll('.tab,.race-tab').forEach(el => el.classList.remove('live'));
 
   const raceData = races[ov.race] || {};
@@ -78,8 +95,12 @@ function syncUI() {
   } else if (ov.mode === 'bandeau_course') {
     act('btnCours', 'stDotCours');
     const coursEl = document.getElementById('stValCours');
-    if (coursEl) coursEl.textContent = ov.team || '—';
+    if (coursEl) { coursEl.textContent = ov.team || '—'; coursEl.classList.add('live'); }
     document.getElementById('tab-encours').classList.add('live');
+    const crtab = document.getElementById('crtab-' + (ov.race || 'medium'));
+    if (crtab) crtab.classList.add('live');
+    showCourseRank = !!(ov.showRank);
+    syncRankToggle();
   } else if (ov.mode === 'partenaires') {
     act('btnSp', 'stDotSp');
     if (stSp) { stSp.textContent = ov.sponsor || '—'; stSp.classList.add('live'); }

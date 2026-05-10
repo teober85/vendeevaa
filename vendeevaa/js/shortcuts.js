@@ -17,6 +17,9 @@ document.addEventListener('keydown', e => {
   const pm = document.getElementById('previewModal');
 
   switch (e.key) {
+    case 'Enter':
+      if (currentTab === 'encours') { e.preventDefault(); showBandeauCours(); }
+      break;
     case 'Escape':
       e.preventDefault();
       if (sc.classList.contains('open'))      sc.classList.remove('open');
@@ -42,14 +45,24 @@ document.addEventListener('keydown', e => {
       e.preventDefault(); switchRace('selectif'); break;
     case 'ArrowLeft': {
       e.preventDefault();
-      const i = RACE_ORDER.indexOf(currentRace);
-      if (i > 0) switchRace(RACE_ORDER[i - 1]);
+      if (currentTab === 'encours') {
+        const i = RACE_ORDER.indexOf(currentCourseRace);
+        if (i > 0) switchCourseRace(RACE_ORDER[i - 1]);
+      } else {
+        const i = RACE_ORDER.indexOf(currentRace);
+        if (i > 0) switchRace(RACE_ORDER[i - 1]);
+      }
       break;
     }
     case 'ArrowRight': {
       e.preventDefault();
-      const i = RACE_ORDER.indexOf(currentRace);
-      if (i < RACE_ORDER.length - 1) switchRace(RACE_ORDER[i + 1]);
+      if (currentTab === 'encours') {
+        const i = RACE_ORDER.indexOf(currentCourseRace);
+        if (i < RACE_ORDER.length - 1) switchCourseRace(RACE_ORDER[i + 1]);
+      } else {
+        const i = RACE_ORDER.indexOf(currentRace);
+        if (i < RACE_ORDER.length - 1) switchRace(RACE_ORDER[i + 1]);
+      }
       break;
     }
     case 's': case 'S':

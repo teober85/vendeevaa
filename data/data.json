@@ -4,9 +4,33 @@
       "name": "Medium",
       "displayName": "Parcours M",
       "distance": "15",
-      "teams": [],
-      "ranking": [],
-      "teamNumbers": {},
+      "teams": [
+        "MAUI VAHINE",
+        "TE RANA VAHINE",
+        "TE HINA VA’A HINE",
+        "VAHINE TUPUNA",
+        "ITATA’E CHINON",
+        "APATO’A VA’A",
+        "LECLERC VOYAGES VA’A API"
+      ],
+      "ranking": [
+        "MAUI VAHINE",
+        "TE RANA VAHINE",
+        "TE HINA VA’A HINE",
+        "VAHINE TUPUNA",
+        "ITATA’E CHINON",
+        "APATO’A VA’A",
+        "LECLERC VOYAGES VA’A API"
+      ],
+      "teamNumbers": {
+        "MAUI VAHINE": "21",
+        "TE RANA VAHINE": "22",
+        "TE HINA VA’A HINE": "23",
+        "VAHINE TUPUNA": "24",
+        "ITATA’E CHINON": "25",
+        "APATO’A VA’A": "26",
+        "LECLERC VOYAGES VA’A API": "27"
+      },
       "raceStatus": {}
     },
     "large": {
@@ -15,33 +39,35 @@
       "distance": "46",
       "teams": [
         "MOANA MANU NUI",
+        "NORD BASSIN VA’A",
         "THE LOVEBOAT",
         "UCKERDRACHEN",
-        "TE RANA TANE",
+        "TE RANA TAHE",
         "HEKE MOANA CHATEL",
+        "RIMA HERE VA’A",
+        "EDEN VA’A",
+        "RSCC-VA’A",
+        "LMVA’A",
         "AUKAI CANOE CLUB",
-        "TUAKI HOE",
-        "MANA O VAA",
-        "LMVA A",
-        "CHAMPIGNY VA A",
-        "RIMA HERE VA A",
-        "NORD BASSIN VA A",
-        "EDEN VA A"
+        "MANA’O VA’A",
+        "TU’AKI HOE",
+        "TEAM 31"
       ],
       "ranking": [
-        "THE LOVEBOAT",
         "MOANA MANU NUI",
-        "AUKAI CANOE CLUB",
-        "TE RANA TANE",
-        "HEKE MOANA CHATEL",
-        "TUAKI HOE",
-        "MANA O VAA",
-        "LMVA A",
-        "CHAMPIGNY VA A",
-        "RIMA HERE VA A",
+        "NORD BASSIN VA’A",
+        "THE LOVEBOAT",
         "UCKERDRACHEN",
-        "NORD BASSIN VA A",
-        "EDEN VA A"
+        "TE RANA TAHE",
+        "HEKE MOANA CHATEL",
+        "RIMA HERE VA’A",
+        "EDEN VA’A",
+        "RSCC-VA’A",
+        "LMVA’A",
+        "AUKAI CANOE CLUB",
+        "MANA’O VA’A",
+        "TU’AKI HOE",
+        "TEAM 31"
       ],
       "teamNumbers": {
         "MOANA MANU NUI": "1",
@@ -50,7 +76,18 @@
         "NORD BASSIN VA A": "2",
         "TE RANA TANE": "5",
         "TEAM HEKE MOANA CHATEL": "6",
-        "RIMA HERE VA A": "7"
+        "RIMA HERE VA A": "7",
+        "NORD BASSIN VA’A": "2",
+        "TE RANA TAHE": "5",
+        "HEKE MOANA CHATEL": "6",
+        "RIMA HERE VA’A": "7",
+        "EDEN VA’A": "8",
+        "RSCC-VA’A": "9",
+        "LMVA’A": "10",
+        "AUKAI CANOE CLUB": "11",
+        "MANA’O VA’A": "12",
+        "TU’AKI HOE": "13",
+        "TEAM 31": "14"
       },
       "raceStatus": {}
     },
@@ -67,11 +104,12 @@
   },
   "overlay": {
     "mode": "hidden",
-    "race": "large",
-    "team": "",
+    "race": "medium",
+    "team": "TE RANA VAHINE",
     "place": 0,
     "showAll": false,
-    "sponsor": ""
+    "sponsor": "",
+    "showRank": false
   },
   "courseName": "Jeudi",
   "sponsors": [

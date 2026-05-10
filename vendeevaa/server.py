@@ -35,6 +35,7 @@ DEFAULT_STATE = {
         "place":   0,
         "showAll": False,
         "sponsor": "",
+        "showRank": False,
     },
     "courseName": "Jeudi",
     "sponsors": [],
@@ -214,7 +215,8 @@ async def ws_handler(websocket):
 
             elif t == "show_bandeau_course":
                 team = msg.get("team", "")
-                state["overlay"] = {"mode": "bandeau_course", "race": race_id, "team": team, "place": 0, "showAll": False, "sponsor": ""}
+                show_rank = bool(msg.get("showRank", False))
+                state["overlay"] = {"mode": "bandeau_course", "race": race_id, "team": team, "place": 0, "showAll": False, "sponsor": "", "showRank": show_rank}
                 await broadcast_state()
 
             elif t == "show_sponsor":

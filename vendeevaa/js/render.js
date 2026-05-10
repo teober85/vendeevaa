@@ -78,24 +78,34 @@ function renderRankList() {
 function renderCourseList() {
   const el    = document.getElementById('coursePirogueList');
   const stEl  = document.getElementById('stValCours');
-  const sel   = stEl.dataset.selected || '', selRace = stEl.dataset.race || '';
-  let html = ''; let any = false;
-  for (const rid of ['medium', 'large', 'selectif']) {
-    const r = races[rid] || {};
-    if (!r.teams || !r.teams.length) continue;
-    if (rid === 'selectif' && !r.enabled) continue;
-    any = true;
-    const dist = r.distance ? ' · ' + r.distance + ' km' : '';
-    html += `<div class="sec-lbl" style="padding:8px 10px 4px;margin-top:2px">${r.name}${dist}</div>`;
-    html += r.teams.map(t => `
-      <div class="chip cours-item" data-name="${esc(t)}" data-race="${rid}"
-           onclick="selectPirogueEnCours('${esc(t)}','${rid}')"
-           style="cursor:pointer;${sel === t && selRace === rid ? 'border-color:rgba(68,144,200,.5);background:rgba(68,144,200,.08);' : ''}">
-        <div class="chip-name">${t}</div>
-        <span style="font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:rgba(122,160,192,.35);">Sélectionner</span>
-      </div>`).join('');
+  const sel   = stEl ? stEl.dataset.selected || '' : '';
+  const selRace = stEl ? stEl.dataset.race || '' : '';
+
+  const race    = races[currentCourseRace] || {};
+  const teams   = race.teams   || [];
+  const ranking = race.ranking || [];
+  const nums    = race.teamNumbers || {};
+
+  if (!teams.length) {
+    el.innerHTML = '<div class="empty">Aucune pirogue</div>';
+    return;
   }
-  el.innerHTML = any ? html : '<div class="empty">Aucune pirogue</div>';
+
+  const ranked   = ranking.filter(t => teams.includes(t));
+  const unranked = teams.filter(t => !ranking.includes(t));
+
+  el.innerHTML = [...ranked, ...unranked].map(t => {
+    const num  = nums[t] || '';
+    const rank = ranking.indexOf(t);
+    const isSel = sel === t && selRace === currentCourseRace;
+    return `
+    <div class="cours-row${isSel ? ' selected' : ''}"
+         onclick="selectPirogueEnCours('${esc(t)}','${currentCourseRace}')">
+      <div class="cours-rank">${rank >= 0 ? rank + 1 : '—'}</div>
+      <div class="cours-name">${t}</div>
+      ${num ? `<div class="cours-num">#${num}</div>` : ''}
+    </div>`;
+  }).join('');
 }
 
 function renderSponsors() {
