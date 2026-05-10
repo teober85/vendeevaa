@@ -94,6 +94,16 @@
   </div>
 </div>
 
+<!-- 5. TITRAGE -->
+<div id="titrage">
+  <div class="tit-stripe"></div>
+  <div class="tit-body">
+    <div class="tit-name" id="titName"></div>
+    <div class="tit-role" id="titRole"></div>
+  </div>
+  <div class="tit-foot"></div>
+</div>
+
 </div><!-- /root -->
 
 <script>
@@ -307,8 +317,20 @@ function overlayDigest(msg) {
   return JSON.stringify(ov);
 }
 
+/* ── Titrage ─────────────────────────────────── */
+function applyTitrage(tov) {
+  const el = document.getElementById('titrage');
+  if (!el) return;
+  if (!tov || !tov.visible) { hide(el); return; }
+  document.getElementById('titName').textContent = (tov.nom || '').toUpperCase();
+  const roleEl = document.getElementById('titRole');
+  if (roleEl) { roleEl.textContent = tov.titre || ''; roleEl.style.display = tov.titre ? '' : 'none'; }
+  show(el);
+}
+
 /* ── WebSocket ───────────────────────────────── */
 let lastDigest = null;
+let lastTitrageDigest = null;
 
 function connect() {
   const ws = new WebSocket(WS_URL);
@@ -321,6 +343,11 @@ function connect() {
       if (digest !== lastDigest) {
         lastDigest = digest;
         applyOverlay(msg.overlay||{mode:'hidden'}, msg);
+      }
+      const td = JSON.stringify(msg.titrage_overlay || {});
+      if (td !== lastTitrageDigest) {
+        lastTitrageDigest = td;
+        applyTitrage(msg.titrage_overlay || {});
       }
     }
   };

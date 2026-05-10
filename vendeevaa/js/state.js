@@ -13,3 +13,5 @@ let cpHSV = { h: 210, s: 0.73, v: 0.66 };
 let cpDragging = null;
 let currentCourseRace = 'medium';
 let showCourseRank = false;
+let titrages = [];
+let titrageOverlay = { visible: false, nom: '', titre: '' };

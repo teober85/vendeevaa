@@ -9,8 +9,11 @@ function connect() {
       races = m.races || {}; sponsors = m.sponsors || [];
       courseName = m.courseName || 'Jeudi';
       overlay = m.overlay || { mode: 'hidden', race: 'medium' };
+      titrages = m.titrages || [];
+      titrageOverlay = m.titrage_overlay || { visible: false, nom: '', titre: '' };
       if (m.colors) overlayColors = { ...DEFAULT_COLORS, ...m.colors };
       renderAll(); syncUI(); syncColorSwatches();
+      renderTitrageList(); syncTitrageUI();
     } else if (m.type === 'saved') {
       flashSave();
     }

@@ -42,6 +42,9 @@
   <div class="tab" onclick="switchTab('partenaires')" id="tab-partenaires">
     Partenaires
   </div>
+  <div class="tab" onclick="switchTab('titrage')" id="tab-titrage">
+    <div class="tab-dot"></div>Titrage
+  </div>
   <div class="tab" onclick="switchTab('couleurs')" id="tab-couleurs">
     Couleurs
   </div>
@@ -288,6 +291,59 @@
 </div><!-- /panel-partenaires -->
 
 <!-- ════════════════════════════════════════════
+  ONGLET — TITRAGE
+════════════════════════════════════════════ -->
+<div class="tab-panel" id="panel-titrage">
+<div style="display:flex;flex:1;overflow:hidden">
+
+  <!-- Noms enregistrés -->
+  <div class="col" style="flex:0 0 280px;min-width:180px">
+    <div class="col-head">
+      <div class="col-head-title">Noms enregistrés</div>
+      <div class="col-head-desc">Cliquer pour sélectionner</div>
+    </div>
+    <div class="col-body" id="titrageList">
+      <div class="empty">Aucun nom enregistré</div>
+    </div>
+  </div>
+
+  <!-- Aperçu + diffusion -->
+  <div class="col ob-col">
+    <div class="preview-wrap">
+      <div class="preview-label">Aperçu live</div>
+      <iframe src="/overlay" class="preview-iframe" scrolling="no"></iframe>
+      <div class="preview-btns">
+        <button class="preview-btn" onclick="previewPopout()" title="Agrandir">⤢</button>
+        <button class="preview-btn" onclick="previewFullscreen(this)" title="Plein écran">⛶</button>
+      </div>
+    </div>
+    <div class="ob-panel">
+      <div class="ob-status">
+        <div class="ob-dot" id="stDotTit"></div>
+        <span class="ob-status-txt" id="stValTit">Masqué</span>
+      </div>
+      <div class="ob-action">
+        <input type="text" class="inp" id="titrageNomInput" placeholder="Nom Prénom..." maxlength="50"
+               style="margin-bottom:8px"
+               onkeydown="if(event.key==='Enter')showTitrage()"/>
+        <input type="text" class="inp" id="titrageRoleInput" placeholder="Titre / Fonction..." maxlength="60"
+               style="margin-bottom:10px"
+               onkeydown="if(event.key==='Enter')showTitrage()"/>
+        <div style="display:flex;gap:8px">
+          <button class="ob-btn ob-green" id="btnTit" onclick="showTitrage()" style="flex:1">Diffuser</button>
+          <button class="btn btn-muted" onclick="saveTitrage()">Enregistrer</button>
+        </div>
+      </div>
+      <div class="ob-action">
+        <button class="ob-btn ob-red" onclick="hideTitrage()">Masquer</button>
+      </div>
+    </div>
+  </div>
+
+</div>
+</div><!-- /panel-titrage -->
+
+<!-- ════════════════════════════════════════════
   ONGLET — COULEURS
 ════════════════════════════════════════════ -->
 <div class="tab-panel" id="panel-couleurs">
@@ -378,6 +434,7 @@
 <script src="/js/teams.js"></script>
 <script src="/js/broadcast.js"></script>
 <script src="/js/sponsors.js"></script>
+<script src="/js/titrages.js"></script>
 <script src="/js/colorpicker.js"></script>
 <script src="/js/ui.js"></script>
 <script src="/js/shortcuts.js"></script>

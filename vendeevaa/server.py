@@ -39,6 +39,12 @@ DEFAULT_STATE = {
     },
     "courseName": "Jeudi",
     "sponsors": [],
+    "titrages": [],
+    "titrage_overlay": {
+        "visible": False,
+        "nom": "",
+        "titre": "",
+    },
     "colors": {
         "primary":    "#2d6ea8",
         "accent":     "#4490c8",
@@ -228,6 +234,19 @@ async def ws_handler(websocket):
             elif t == "hide":
                 state["overlay"]["mode"]    = "hidden"
                 state["overlay"]["showAll"] = False
+                await broadcast_state()
+
+            # ── Titrage ───────────────────────────────
+            elif t == "show_titrage":
+                state["titrage_overlay"] = {"visible": True, "nom": msg.get("nom", ""), "titre": msg.get("titre", "")}
+                await broadcast_state()
+
+            elif t == "hide_titrage":
+                state["titrage_overlay"] = {"visible": False, "nom": "", "titre": ""}
+                await broadcast_state()
+
+            elif t == "set_titrages":
+                state["titrages"] = [x for x in msg.get("titrages", []) if isinstance(x, dict) and x.get("nom")]
                 await broadcast_state()
 
             # ── Sponsors ─────────────────────────────

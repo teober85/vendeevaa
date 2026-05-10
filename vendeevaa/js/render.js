@@ -7,6 +7,7 @@ function renderAll() {
   renderCourseList();
   renderSponsors();
   renderBannerSelects();
+  renderTitrageList();
   updateSelectifBadge();
   const r   = races[currentRace] || { distance: '', displayName: '' };
   const di  = document.getElementById('distanceInput');    if (di)  di.value  = r.distance    || '';

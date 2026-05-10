@@ -305,6 +305,10 @@ kbd { display:inline-flex; align-items:center; justify-content:center; min-width
   letter-spacing:2px; text-transform:uppercase; color:rgba(122,160,192,.45); flex:1;
 }
 
+/* ─ TITRAGE ─ */
+.tit-chip { cursor:pointer; }
+.tit-chip:hover { border-color:rgba(45,110,168,.35); background:rgba(45,110,168,.06); }
+
 /* ─ SPLIT HANDLE ─ */
 .split-handle {
   width:8px; flex-shrink:0; position:relative;

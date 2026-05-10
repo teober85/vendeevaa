@@ -188,6 +188,36 @@ html, body { width:100%; height:100%; background:transparent; overflow:hidden; }
 .bc-foot { position:absolute; bottom:0; left:0; right:0; height:2px; background:linear-gradient(to right,var(--blue3),var(--blue) 30%,rgba(45,110,168,.1)); }
 
 /* ════════════════════════════════════════════════════
+   4b. TITRAGE — bas gauche
+════════════════════════════════════════════════════ */
+#titrage {
+  display:none;
+  position:absolute; bottom:96px; left:0;
+  pointer-events:none;
+  filter:drop-shadow(0 8px 32px rgba(0,0,0,.55));
+  transform:translateX(-105%); opacity:1;
+}
+#titrage.vis  { display:block; animation:bannerIn  .65s cubic-bezier(.16,1,.3,1) forwards; }
+#titrage.hide { display:block; animation:bannerOut .5s  cubic-bezier(.4,0,1,1)  forwards; }
+
+.tit-stripe { height:5px; background:linear-gradient(to right,var(--blue3),var(--blue),transparent); }
+.tit-body {
+  background:var(--navy); border-left:6px solid var(--blue3);
+  padding:18px 56px 18px 28px;
+}
+.tit-name {
+  font-family:'Barlow Condensed',sans-serif; font-size:72px; font-weight:900;
+  line-height:1; letter-spacing:2px; text-transform:uppercase;
+  color:var(--text); white-space:nowrap;
+}
+.tit-role {
+  font-family:'Barlow Condensed',sans-serif; font-size:22px; font-weight:600;
+  letter-spacing:4px; text-transform:uppercase;
+  color:var(--blue3); margin-top:8px; white-space:nowrap;
+}
+.tit-foot { height:5px; background:linear-gradient(to right,var(--blue3),var(--blue) 40%,transparent); }
+
+/* ════════════════════════════════════════════════════
    4. PARTENAIRES — centré
 ════════════════════════════════════════════════════ */
 #sponsor-card {
