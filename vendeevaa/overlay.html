@@ -216,7 +216,7 @@ body { background:transparent; width:1920px; height:1080px; overflow:hidden; pos
   </svg>
   <div class="lb-head">
     <div class="lb-ev">Vendée Va'a · Les Sables d'Olonne</div>
-    <div class="lb-tit">Classement</div>
+    <div class="lb-tit">Classement <span id="lbRaceName" style="font-size:18px;font-weight:600;opacity:.5;letter-spacing:4px"></span></div>
     <div class="lb-live"><div class="ldot"></div>En direct</div>
   </div>
   <div class="lb-body">
@@ -231,7 +231,7 @@ body { background:transparent; width:1920px; height:1080px; overflow:hidden; pos
     <div class="ldot"></div>
     <span class="lb-foot-txt">Classement officiel</span>
     <div class="lb-foot-sep"></div>
-    <span class="lb-foot-ev">Vendée Va'a 2024</span>
+    <span class="lb-foot-ev">Vendée Va'a 2024 <span id="lbDist"></span></span>
   </div>
 </div>
 
@@ -240,7 +240,7 @@ body { background:transparent; width:1920px; height:1080px; overflow:hidden; pos
   <div class="bn-stripe">
     <span class="bn-slbl">Arrivée</span>
     <div class="bn-ssep"></div>
-    <span class="bn-sev">Vendée Va'a — Les Sables d'Olonne</span>
+    <span class="bn-sev" id="bnRaceLabel">Vendée Va'a — Les Sables d'Olonne</span>
   </div>
   <div class="bn-body">
     <div class="bn-place">
@@ -259,7 +259,7 @@ body { background:transparent; width:1920px; height:1080px; overflow:hidden; pos
 <div id="bandeau-course">
   <div class="bc-wrap">
     <div class="bc-label">
-      <span class="bc-label-txt">En course</span>
+      <span class="bc-label-txt" id="bcRaceLabel">En course</span>
     </div>
     <div class="bc-body">
       <div class="bc-body" style="background:transparent;border:none;padding:0;position:static;overflow:visible;display:flex;align-items:center;gap:20px;flex:1;">
@@ -361,6 +361,11 @@ function renderBandeauCourse(teamName) {
   document.getElementById('bcTeam').textContent = teamName.toUpperCase();
 }
 
+/* ── Helpers course ──────────────────────────── */
+function getRace(raceId) {
+  return (fullState && fullState.races && fullState.races[raceId]) || {};
+}
+
 /* ── Application de l'état overlay ──────────── */
 function applyOverlay(st, state) {
   const lb = document.getElementById('leaderboard');
@@ -374,22 +379,30 @@ function applyOverlay(st, state) {
     all.forEach(hide); return;
   }
 
+  const race = getRace(st.race);
+  const raceName = race.name || '';
+  const raceDist = race.distance ? ' · ' + race.distance + ' km' : '';
+
   switch(st.mode) {
     case 'classement':
       [bn,bc,sp].forEach(hide);
-      renderClassement(state.ranking||[]);
+      document.getElementById('lbRaceName').textContent = raceName ? '· ' + raceName : '';
+      document.getElementById('lbDist').textContent = race.distance ? '· ' + race.distance + ' km' : '';
+      renderClassement((race.ranking)||[]);
       show(lb);
       break;
     case 'arrivee':
       [lb,bc,sp].forEach(hide);
-      document.getElementById('bnNum').textContent = st.place;
-      document.getElementById('bnNum').className   = 'bn-num'+(st.place===1?' p1':'');
-      document.getElementById('bnSuf').textContent = st.place===1?'ÈRE PLACE':'ÈME PLACE';
+      document.getElementById('bnNum').textContent  = st.place;
+      document.getElementById('bnNum').className    = 'bn-num'+(st.place===1?' p1':'');
+      document.getElementById('bnSuf').textContent  = st.place===1?'ÈRE PLACE':'ÈME PLACE';
       document.getElementById('bnName').textContent = (st.team||'').toUpperCase();
+      document.getElementById('bnRaceLabel').textContent = raceName || 'Vendée Va\'a — Les Sables d\'Olonne';
       show(bn);
       break;
     case 'bandeau_course':
       [lb,bn,sp].forEach(hide);
+      document.getElementById('bcRaceLabel').textContent = (raceName || 'En course').toUpperCase();
       renderBandeauCourse(st.team||'');
       show(bc);
       break;

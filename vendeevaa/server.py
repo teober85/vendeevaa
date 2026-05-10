@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Vendée Va'a — Serveur de régie v2
+Vendée Va'a — Serveur de régie v3
 ====================================
 Régie    → http://localhost:8765
 Overlay  → http://localhost:8765/overlay
@@ -8,7 +8,7 @@ Overlay  → http://localhost:8765/overlay
 Dépendance : pip install websockets
 """
 
-import asyncio, json, os, threading, webbrowser, base64, mimetypes
+import asyncio, copy, json, os, threading, webbrowser, base64, mimetypes
 from http.server import BaseHTTPRequestHandler, HTTPServer
 from pathlib import Path
 from websockets.server import serve
@@ -23,16 +23,19 @@ SAVE_FILE  = DATA_DIR / "data.json"
 
 # ─── État par défaut ──────────────────────────────────
 DEFAULT_STATE = {
-    "teams":    [],   # [str] noms des pirogues inscrites
-    "ranking":  [],   # [str] noms ordonnés (index 0 = 1re place)
+    "races": {
+        "medium":  {"name": "Medium",           "distance": "", "teams": [], "ranking": []},
+        "large":   {"name": "Large",            "distance": "", "teams": [], "ranking": []},
+        "selectif":{"name": "Sélectif National","distance": "", "teams": [], "ranking": [], "enabled": False},
+    },
     "overlay": {
         "mode":    "hidden",   # hidden|classement|arrivee|bandeau_course|partenaires
+        "race":    "medium",
         "team":    "",
         "place":   0,
         "showAll": False,
-        "sponsor": "",         # nom du partenaire actif (optionnel)
+        "sponsor": "",
     },
-    # Partenaires : [{ nom, logo_b64, description }]
     "sponsors": [],
 }
 
@@ -41,20 +44,32 @@ def load_state():
     if SAVE_FILE.exists():
         try:
             saved = json.loads(SAVE_FILE.read_text(encoding="utf-8"))
-            state = dict(DEFAULT_STATE)
-            state.update(saved)
-            # S'assurer que les clés manquantes sont présentes
-            for k, v in DEFAULT_STATE.items():
-                if k not in state:
+            state = copy.deepcopy(DEFAULT_STATE)
+
+            # Migration depuis le format v2 (teams/ranking à la racine)
+            if "teams" in saved and "races" not in saved:
+                state["races"]["medium"]["teams"]   = saved.pop("teams", [])
+                state["races"]["medium"]["ranking"] = saved.pop("ranking", [])
+                saved.pop("compositions", None)
+
+            # Fusionner les données sauvegardées
+            for k, v in saved.items():
+                if k == "races":
+                    for rid, rdata in v.items():
+                        if rid in state["races"]:
+                            state["races"][rid].update(rdata)
+                        else:
+                            state["races"][rid] = rdata
+                elif k == "overlay":
+                    state["overlay"].update(v)
+                else:
                     state[k] = v
-            ov = dict(DEFAULT_STATE["overlay"])
-            ov.update(state.get("overlay", {}))
-            state["overlay"] = ov
+
             print(f"  Données chargées depuis {SAVE_FILE.name}")
             return state
         except Exception as e:
             print(f"  Avertissement : impossible de lire data.json ({e})")
-    return dict(DEFAULT_STATE)
+    return copy.deepcopy(DEFAULT_STATE)
 
 def save_state(state):
     try:
@@ -90,77 +105,97 @@ async def ws_handler(websocket):
                 msg = json.loads(raw)
             except json.JSONDecodeError:
                 continue
-            t = msg.get("type")
+            t       = msg.get("type")
+            race_id = msg.get("race", "medium")
 
             # ── Équipes ──────────────────────────────
             if t == "add_team":
                 name = msg.get("name", "").strip()
-                if name and name not in state["teams"] and len(state["teams"]) < 60:
-                    state["teams"].append(name)
-                    await broadcast_state()
+                if race_id in state["races"]:
+                    r = state["races"][race_id]
+                    if name and name not in r["teams"] and len(r["teams"]) < 60:
+                        r["teams"].append(name)
+                        await broadcast_state()
 
             elif t == "remove_team":
                 name = msg.get("name", "")
-                state["teams"] = [x for x in state["teams"] if x != name]
-                state["ranking"] = [x for x in state["ranking"] if x != name]
-                if state["overlay"].get("team") == name:
-                    state["overlay"]["mode"] = "hidden"
-                    state["overlay"]["team"] = ""
-                await broadcast_state()
+                if race_id in state["races"]:
+                    r = state["races"][race_id]
+                    r["teams"]   = [x for x in r["teams"]   if x != name]
+                    r["ranking"] = [x for x in r["ranking"] if x != name]
+                    if state["overlay"].get("race") == race_id and state["overlay"].get("team") == name:
+                        state["overlay"]["mode"] = "hidden"
+                        state["overlay"]["team"] = ""
+                    await broadcast_state()
 
             elif t == "rename_team":
                 old = msg.get("old", "")
                 new = msg.get("new", "").strip()
-                if old in state["teams"] and new and new not in state["teams"]:
-                    idx = state["teams"].index(old)
-                    state["teams"][idx] = new
-                    state["ranking"] = [new if x == old else x for x in state["ranking"]]
-                    if state["overlay"].get("team") == old:
-                        state["overlay"]["team"] = new
-                    await broadcast_state()
+                if race_id in state["races"]:
+                    r = state["races"][race_id]
+                    if old in r["teams"] and new and new not in r["teams"]:
+                        idx = r["teams"].index(old)
+                        r["teams"][idx] = new
+                        r["ranking"] = [new if x == old else x for x in r["ranking"]]
+                        if state["overlay"].get("race") == race_id and state["overlay"].get("team") == old:
+                            state["overlay"]["team"] = new
+                        await broadcast_state()
 
             # ── Classement ───────────────────────────
             elif t == "set_ranking":
-                new_r = msg.get("ranking", [])
-                state["ranking"] = [r for r in new_r if r in state["teams"]]
-                await broadcast_state()
+                if race_id in state["races"]:
+                    r = state["races"][race_id]
+                    r["ranking"] = [x for x in msg.get("ranking", []) if x in r["teams"]]
+                    await broadcast_state()
 
             elif t == "add_to_ranking":
                 name = msg.get("name", "")
-                if name in state["teams"] and name not in state["ranking"]:
-                    state["ranking"].append(name)
-                    await broadcast_state()
+                if race_id in state["races"]:
+                    r = state["races"][race_id]
+                    if name in r["teams"] and name not in r["ranking"]:
+                        r["ranking"].append(name)
+                        await broadcast_state()
 
             elif t == "remove_from_ranking":
                 name = msg.get("name", "")
-                if name in state["ranking"]:
-                    state["ranking"].remove(name)
+                if race_id in state["races"] and name in state["races"][race_id]["ranking"]:
+                    state["races"][race_id]["ranking"].remove(name)
+                    await broadcast_state()
+
+            # ── Config course ─────────────────────────
+            elif t == "set_race_config":
+                if race_id in state["races"]:
+                    r = state["races"][race_id]
+                    if "distance" in msg:
+                        r["distance"] = str(msg["distance"])
+                    if "enabled" in msg and race_id == "selectif":
+                        r["enabled"] = bool(msg["enabled"])
                     await broadcast_state()
 
             # ── Overlay ──────────────────────────────
             elif t == "show_classement":
-                state["overlay"] = {"mode": "classement", "team": "", "place": 0, "showAll": True, "sponsor": ""}
+                state["overlay"] = {"mode": "classement", "race": race_id, "team": "", "place": 0, "showAll": True, "sponsor": ""}
                 await broadcast_state()
 
             elif t == "show_banner":
                 team  = msg.get("team", "")
                 place = int(msg.get("place", 0))
                 if team and place > 0:
-                    state["overlay"] = {"mode": "arrivee", "team": team, "place": place, "showAll": False, "sponsor": ""}
+                    state["overlay"] = {"mode": "arrivee", "race": race_id, "team": team, "place": place, "showAll": False, "sponsor": ""}
                     await broadcast_state()
 
             elif t == "show_bandeau_course":
                 team = msg.get("team", "")
-                state["overlay"] = {"mode": "bandeau_course", "team": team, "place": 0, "showAll": False, "sponsor": ""}
+                state["overlay"] = {"mode": "bandeau_course", "race": race_id, "team": team, "place": 0, "showAll": False, "sponsor": ""}
                 await broadcast_state()
 
             elif t == "show_sponsor":
                 sponsor = msg.get("sponsor", "")
-                state["overlay"] = {"mode": "partenaires", "team": "", "place": 0, "showAll": False, "sponsor": sponsor}
+                state["overlay"] = {"mode": "partenaires", "race": "", "team": "", "place": 0, "showAll": False, "sponsor": sponsor}
                 await broadcast_state()
 
             elif t == "hide":
-                state["overlay"]["mode"] = "hidden"
+                state["overlay"]["mode"]    = "hidden"
                 state["overlay"]["showAll"] = False
                 await broadcast_state()
 
@@ -214,12 +249,11 @@ class Handler(BaseHTTPRequestHandler):
         self.end_headers()
 
     def do_POST(self):
-        """Upload d'image (photo membre ou logo sponsor)"""
+        """Upload d'image (logo sponsor)"""
         length = int(self.headers.get("Content-Length", 0))
         body = self.rfile.read(length)
         try:
             payload = json.loads(body)
-            # payload: { context: "member"|"sponsor", filename: str, data: base64str }
             result = {"ok": True, "data": payload.get("data", "")}
             self.serve_json(result)
         except Exception as e:
@@ -240,12 +274,13 @@ def run_http():
 # ─── Main ─────────────────────────────────────────────
 async def main():
     print("=" * 54)
-    print("  Vendée Va'a — Serveur de régie v2")
+    print("  Vendée Va'a — Serveur de régie v3")
     print("=" * 54)
-    print(f"  Régie    →  http://{HOST}:{HTTP_PORT}")
-    print(f"  Overlay  →  http://{HOST}:{HTTP_PORT}/overlay")
+    print(f"  Régie    →  http://localhost:{HTTP_PORT}")
+    print(f"  Overlay  →  http://localhost:{HTTP_PORT}/overlay")
     print(f"  Données  →  {SAVE_FILE}")
     print("-" * 54)
+    print("  Courses  :  Medium · Large · Sélectif National")
     print("  Ctrl+C pour arrêter")
     print("=" * 54 + "\n")
 
