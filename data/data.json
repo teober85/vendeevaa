@@ -2,12 +2,14 @@
   "races": {
     "medium": {
       "name": "Medium",
+      "displayName": "Parcours M",
       "distance": "",
       "teams": [],
       "ranking": []
     },
     "large": {
       "name": "Large",
+      "displayName": "Parcours L",
       "distance": "",
       "teams": [
         "MOANA MANU NUI",
@@ -42,6 +44,7 @@
     },
     "selectif": {
       "name": "Sélectif National",
+      "displayName": "Sélectif",
       "distance": "",
       "teams": [],
       "ranking": [],
@@ -51,7 +54,7 @@
   "overlay": {
     "mode": "hidden",
     "race": "large",
-    "team": "",
+    "team": "MOANA MANU NUI",
     "place": 0,
     "showAll": false,
     "sponsor": ""

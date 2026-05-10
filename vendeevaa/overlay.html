@@ -24,23 +24,14 @@
     <path d="M341 22 C345 14 341 6 333 8 C327 10 321 14 323 22" stroke="#2d6ea8" stroke-width="2.2" stroke-linecap="round" opacity="0.6"/>
   </svg>
   <div class="lb-head">
-    <div class="lb-ev">Vendée Va'a · Les Sables d'Olonne</div>
-    <div class="lb-tit">Classement <span id="lbRaceName" style="font-size:18px;font-weight:600;opacity:.5;letter-spacing:4px"></span></div>
-    <div class="lb-live"><div class="ldot"></div>En direct</div>
+    <div class="lb-tit" id="lbRaceName">—</div>
   </div>
   <div class="lb-body">
     <div class="lb-cols">
-      <span class="lb-col">Rang</span>
+      <span class="lb-col">Position</span>
       <span class="lb-col">Pirogue</span>
-      <span class="lb-col" style="text-align:right">Position</span>
     </div>
     <div id="lbRows"></div>
-  </div>
-  <div class="lb-foot">
-    <div class="ldot"></div>
-    <span class="lb-foot-txt">Classement officiel</span>
-    <div class="lb-foot-sep"></div>
-    <span class="lb-foot-ev">Vendée Va'a 2024 <span id="lbDist"></span></span>
   </div>
 </div>
 
@@ -149,7 +140,6 @@ function renderClassement(ranking) {
       <div class="lb-row${rowGrade(i)}" data-r>
         <div class="lb-rank">${i+1}</div>
         <div class="lb-name">${name.toUpperCase()}</div>
-        <div class="lb-pos">${ordinal(i+1)} PLACE</div>
       </div>`).join('');
     requestAnimationFrame(() => {
       rows.querySelectorAll('[data-r]').forEach((r,i) => {
@@ -197,14 +187,12 @@ function applyOverlay(st, state) {
   }
 
   const race = getRace(st.race);
-  const raceName = race.name || '';
-  const raceDist = race.distance ? ' · ' + race.distance + ' km' : '';
+  const displayName = race.displayName || race.name || '';
 
   switch(st.mode) {
     case 'classement':
       [bn,bc,sp].forEach(hide);
-      document.getElementById('lbRaceName').textContent = raceName ? '· ' + raceName : '';
-      document.getElementById('lbDist').textContent = race.distance ? '· ' + race.distance + ' km' : '';
+      document.getElementById('lbRaceName').textContent = displayName;
       renderClassement((race.ranking)||[]);
       show(lb);
       break;
@@ -214,12 +202,12 @@ function applyOverlay(st, state) {
       document.getElementById('bnNum').className    = 'bn-num'+(st.place===1?' p1':'');
       document.getElementById('bnSuf').textContent  = st.place===1?'ÈRE PLACE':'ÈME PLACE';
       document.getElementById('bnName').textContent = (st.team||'').toUpperCase();
-      document.getElementById('bnRaceLabel').textContent = raceName || 'Vendée Va\'a — Les Sables d\'Olonne';
+      document.getElementById('bnRaceLabel').textContent = displayName;
       show(bn);
       break;
     case 'bandeau_course':
       [lb,bn,sp].forEach(hide);
-      document.getElementById('bcRaceLabel').textContent = (raceName || 'En course').toUpperCase();
+      document.getElementById('bcRaceLabel').textContent = (displayName || 'En course').toUpperCase();
       renderBandeauCourse(st.team||'');
       show(bc);
       break;

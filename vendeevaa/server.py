@@ -24,9 +24,9 @@ SAVE_FILE  = DATA_DIR / "data.json"
 # ─── État par défaut ──────────────────────────────────
 DEFAULT_STATE = {
     "races": {
-        "medium":  {"name": "Medium",           "distance": "", "teams": [], "ranking": []},
-        "large":   {"name": "Large",            "distance": "", "teams": [], "ranking": []},
-        "selectif":{"name": "Sélectif National","distance": "", "teams": [], "ranking": [], "enabled": False},
+        "medium":  {"name": "Medium",           "displayName": "Parcours M", "distance": "", "teams": [], "ranking": []},
+        "large":   {"name": "Large",            "displayName": "Parcours L", "distance": "", "teams": [], "ranking": []},
+        "selectif":{"name": "Sélectif National","displayName": "Sélectif",  "distance": "", "teams": [], "ranking": [], "enabled": False},
     },
     "overlay": {
         "mode":    "hidden",   # hidden|classement|arrivee|bandeau_course|partenaires
@@ -175,6 +175,8 @@ async def ws_handler(websocket):
                     r = state["races"][race_id]
                     if "distance" in msg:
                         r["distance"] = str(msg["distance"])
+                    if "displayName" in msg:
+                        r["displayName"] = str(msg["displayName"])
                     if "enabled" in msg and race_id == "selectif":
                         r["enabled"] = bool(msg["enabled"])
                     await broadcast_state()
