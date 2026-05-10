@@ -1,4 +1,6 @@
-const WS_URL = 'ws://localhost:8766';
+const WS_URL = (location.hostname === 'localhost' || location.hostname === '127.0.0.1')
+  ? 'ws://localhost:8766'
+  : (location.protocol === 'https:' ? 'wss://' : 'ws://') + location.host + '/ws';
 let ws;
 let races = {}, sponsors = [], courseName = 'Jeudi';
 let overlay = { mode: 'hidden', race: 'medium', team: '', place: 0, showAll: false, sponsor: '' };
