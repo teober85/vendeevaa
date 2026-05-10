@@ -157,6 +157,10 @@ body { background:var(--deep); color:var(--white); font-family:'Barlow',sans-ser
 .sec-lbl { font-family:'Barlow Condensed',sans-serif; font-size:11px; font-weight:800; letter-spacing:3px; text-transform:uppercase; color:rgba(122,160,192,.38); margin-bottom:9px; display:flex; align-items:center; gap:8px; }
 .sec-lbl::after { content:''; flex:1; height:1px; background:var(--line); }
 
+/* ─ SETTINGS PANEL ─ */
+.settings-panel { display:none; width:270px; flex-shrink:0; flex-direction:column; border-right:1px solid var(--line); overflow:hidden; }
+.settings-panel.open { display:flex; }
+
 /* ─ BCAST COLUMN ─ */
 .bcast-block { padding:14px 15px; border-bottom:1px solid var(--line); }
 .bcast-inner { flex:1; overflow-y:auto; }
@@ -245,34 +249,45 @@ body { background:var(--deep); color:var(--white); font-family:'Barlow',sans-ser
   </div>
 </div>
 
-<div class="three-col">
-
-  <!-- Col 1 : pirogues -->
-  <div class="col">
-    <div class="col-head">
-      <div class="col-head-title">Pirogues participantes</div>
-      <div class="col-head-desc">Ajoutez toutes les équipes</div>
+<!-- Panneau réglages (masqué par défaut) -->
+<div class="settings-panel" id="settingsPanel">
+  <div class="col-head" style="flex-shrink:0">
+    <div style="display:flex;align-items:center;gap:8px">
+      <div style="flex:1">
+        <div class="col-head-title">Réglages</div>
+        <div class="col-head-desc" id="settingsRaceLabel">—</div>
+      </div>
+      <button class="icon-btn action" onclick="toggleSettings()" title="Fermer">✕</button>
     </div>
-    <div class="field" id="selectifRow" style="display:none;align-items:center">
-      <span style="flex:1;font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--mist)">Sélectif National</span>
-      <button class="btn btn-muted" id="selectifToggleBtn" onclick="toggleSelectif()">Activer</button>
-    </div>
-    <div class="field">
-      <input type="text" class="inp" id="distanceInput" placeholder="Distance (km)..." maxlength="20"/>
-      <button class="btn btn-muted" onclick="saveDistance()">OK</button>
-    </div>
-    <div class="field">
-      <input type="text" class="inp" id="teamInput" placeholder="Nom de la pirogue..." maxlength="40"/>
-      <button class="btn btn-blue" onclick="addTeam()">Ajouter</button>
-    </div>
-    <div class="col-body" id="teamPool"><div class="empty">Aucune pirogue</div></div>
   </div>
+  <div class="field" id="selectifRow" style="display:none;align-items:center">
+    <span style="flex:1;font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--mist)">Sélectif National</span>
+    <button class="btn btn-muted" id="selectifToggleBtn" onclick="toggleSelectif()">Activer</button>
+  </div>
+  <div class="field">
+    <input type="text" class="inp" id="distanceInput" placeholder="Distance (km)..." maxlength="20"/>
+    <button class="btn btn-muted" onclick="saveDistance()">OK</button>
+  </div>
+  <div class="field">
+    <input type="text" class="inp" id="teamInput" placeholder="Nom de la pirogue..." maxlength="40"/>
+    <button class="btn btn-blue" onclick="addTeam()">Ajouter</button>
+  </div>
+  <div class="col-body" id="teamPool"><div class="empty">Aucune pirogue</div></div>
+</div>
 
-  <!-- Col 2 : classement -->
-  <div class="col">
+<!-- Vue live : classement + diffusion -->
+<div style="display:flex;flex:1;overflow:hidden">
+
+  <!-- Classement -->
+  <div class="col" style="flex:1">
     <div class="col-head">
-      <div class="col-head-title">Classement officiel</div>
-      <div class="col-head-desc">Glisser-déposer ou flèches ▲▼</div>
+      <div style="display:flex;align-items:center;gap:10px">
+        <div style="flex:1">
+          <div class="col-head-title">Classement officiel</div>
+          <div class="col-head-desc">Glisser-déposer ou flèches ▲▼</div>
+        </div>
+        <button class="btn btn-muted" onclick="toggleSettings()" id="settingsBtn">⚙ Réglages</button>
+      </div>
     </div>
     <div class="field">
       <select class="sel" id="addSel"><option value="">Choisir une pirogue à classer...</option></select>
@@ -284,8 +299,8 @@ body { background:var(--deep); color:var(--white); font-family:'Barlow',sans-ser
     </div>
   </div>
 
-  <!-- Col 3 : diffusion classement -->
-  <div class="col">
+  <!-- Diffusion -->
+  <div class="col" style="width:300px;flex-shrink:0">
     <div class="col-head">
       <div class="col-head-title">Diffusion OBS</div>
       <div class="col-head-desc">Ce qui apparaît à l'écran</div>
@@ -325,7 +340,7 @@ body { background:var(--deep); color:var(--white); font-family:'Barlow',sans-ser
     </div>
   </div>
 
-</div>
+</div><!-- /vue live -->
 </div><!-- /flex wrapper -->
 </div><!-- /panel-classement -->
 
@@ -493,9 +508,15 @@ function switchRace(race) {
   // Distance input
   const r=races[race]||{distance:''};
   const di=document.getElementById('distanceInput'); if(di)di.value=r.distance||'';
+  // Settings panel label
+  const sl=document.getElementById('settingsRaceLabel');
+  if(sl)sl.textContent=(races[race]||{}).name||race;
   // Toggle btn label
   updateSelectifBadge();
   renderTeamPool(); renderRankList(); renderBannerSelects();
+}
+function toggleSettings(){
+  document.getElementById('settingsPanel').classList.toggle('open');
 }
 function toggleSelectif(){
   const r=races['selectif']||{};

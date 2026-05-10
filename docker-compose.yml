@@ -1,7 +1,7 @@
 services:
   vendee-vaa:
     build:
-      context: "./vendee-vaa-server 3v"
+      context: "./vendeevaa"
     ports:
       - "8765:8765"
       - "8766:8766"

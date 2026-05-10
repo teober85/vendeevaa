@@ -50,7 +50,7 @@
   },
   "overlay": {
     "mode": "hidden",
-    "race": "medium",
+    "race": "large",
     "team": "MOANA MANU NUI",
     "place": 0,
     "showAll": false,
