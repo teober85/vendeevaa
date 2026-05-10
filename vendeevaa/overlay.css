@@ -43,10 +43,10 @@ html, body { width:100%; height:100%; background:transparent; overflow:hidden; }
 ════════════════════════════════════════════════════ */
 #leaderboard {
   position:absolute; top:50%; left:50%;
-  width:820px; pointer-events:none;
+  width:960px; pointer-events:none;
   transform:translate(-50%,-50%) scale(.88); opacity:0;
 }
-#leaderboard.vis { transform:translate(-50%,-50%) scale(1); opacity:1; transition:transform .65s cubic-bezier(.16,1,.3,1), opacity .45s ease; }
+#leaderboard.vis { transform:translate(-50%,-50%) scale(1); opacity:.99; transition:transform .65s cubic-bezier(.16,1,.3,1), opacity .45s ease; }
 #leaderboard.hide { transform:translate(-50%,-50%) scale(.94); opacity:0; transition:transform .4s cubic-bezier(.4,0,1,1), opacity .3s ease; }
 
 .lb-logo-bg {
@@ -63,7 +63,7 @@ html, body { width:100%; height:100%; background:transparent; overflow:hidden; }
 .lb-sub { display:none; }
 .lb-tit { font-family:'Barlow Condensed',sans-serif; font-size:32px; font-weight:900; letter-spacing:5px; text-transform:uppercase; color:#fff; line-height:1; }
 
-.lb-body { position:relative; z-index:1; background:var(--navy); border-left:3px solid var(--blue); border-right:3px solid rgba(45,110,168,.2); }
+.lb-body { position:relative; z-index:1; background:#070e1c; border-left:3px solid var(--blue); border-right:3px solid rgba(45,110,168,.2); }
 .lb-cols { display:grid; grid-template-columns:72px 1fr; padding:7px 24px 5px; border-bottom:1px solid rgba(45,110,168,.18); }
 .lb-col  { font-family:'Barlow Condensed',sans-serif; font-size:11px; font-weight:700; letter-spacing:3px; text-transform:uppercase; color:rgba(255,255,255,.25); }
 .lb-row  { display:grid; grid-template-columns:72px 1fr; align-items:center; padding:0 24px; height:72px; border-bottom:1px solid rgba(45,110,168,.1); opacity:0; transform:translateX(-16px); transition:opacity .4s ease, transform .4s ease; position:relative; }
@@ -77,6 +77,11 @@ html, body { width:100%; height:100%; background:transparent; overflow:hidden; }
 .lb-row.r1::before{background:var(--blue3);}
 .lb-row.r2::before{background:rgba(68,144,200,.45);}
 .lb-row.r3::before{background:rgba(68,144,200,.22);}
+
+/* Deux colonnes (> 7 équipes) */
+#lbRows.two-col { display:flex; align-items:flex-start; }
+.lb-col-split { flex:1; min-width:0; }
+.lb-col-split:first-child { border-right:1px solid rgba(45,110,168,.2); }
 
 /* Status: arrivé */
 .lb-row.status-arrive { background:rgba(46,204,113,.07) !important; border-bottom-color:rgba(46,204,113,.15); }

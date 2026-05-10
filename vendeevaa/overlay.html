@@ -130,20 +130,34 @@ function renderClassement(ranking, teamNumbers, raceStatus) {
   const nums = teamNumbers || {};
   const statuses = raceStatus || {};
   const rows = document.getElementById('lbRows');
+  const lbCols = document.querySelector('.lb-cols');
   rows.querySelectorAll('.lb-row.in').forEach(r => r.classList.replace('in','out'));
   setTimeout(() => {
-    rows.innerHTML = ranking.map((name,i) => {
+    const twoCol = ranking.length > 7;
+    const mid = Math.ceil(ranking.length / 2);
+    if (lbCols) lbCols.style.display = twoCol ? 'none' : '';
+
+    function makeRow(name, i) {
       const num = nums[name] || '';
       const st = statuses[name] || '';
-      return `
-        <div class="lb-row${rowGrade(i)}${st?' status-'+st:''}" data-r>
-          <div class="lb-rank">${i+1}</div>
-          <div class="lb-name-wrap">
-            <div class="lb-name">${name.toUpperCase()}</div>
-            ${num ? `<div class="lb-num">${num}</div>` : ''}
-          </div>
-        </div>`;
-    }).join('');
+      return `<div class="lb-row${rowGrade(i)}${st?' status-'+st:''}" data-r>
+        <div class="lb-rank">${i+1}</div>
+        <div class="lb-name-wrap">
+          <div class="lb-name">${name.toUpperCase()}</div>
+          ${num ? `<div class="lb-num">${num}</div>` : ''}
+        </div>
+      </div>`;
+    }
+
+    if (twoCol) {
+      const left  = ranking.slice(0, mid).map((n, i) => makeRow(n, i)).join('');
+      const right = ranking.slice(mid).map((n, i) => makeRow(n, mid + i)).join('');
+      rows.innerHTML = `<div class="lb-col-split">${left}</div><div class="lb-col-split">${right}</div>`;
+    } else {
+      rows.innerHTML = ranking.map((n, i) => makeRow(n, i)).join('');
+    }
+    rows.classList.toggle('two-col', twoCol);
+
     requestAnimationFrame(() => {
       rows.querySelectorAll('[data-r]').forEach((r,i) => {
         setTimeout(() => r.classList.add('in'), i*80);

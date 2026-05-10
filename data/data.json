@@ -104,12 +104,11 @@
   },
   "overlay": {
     "mode": "hidden",
-    "race": "medium",
-    "team": "TE RANA VAHINE",
+    "race": "large",
+    "team": "",
     "place": 0,
     "showAll": false,
-    "sponsor": "",
-    "showRank": false
+    "sponsor": ""
   },
   "courseName": "Jeudi",
   "sponsors": [

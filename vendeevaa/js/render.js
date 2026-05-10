@@ -59,8 +59,10 @@ function renderRankList() {
          ondragover="onDragOver(event)" ondrop="onDrop(event)">
       <div class="rr-num ${nc(i)}">${i + 1}</div>
       <div class="rr-handle">⋮⋮</div>
-      <div class="rr-name">${t}</div>
-      ${num ? `<div class="rr-pirnum">${num}</div>` : ''}
+      <div class="rr-name-group">
+        <div class="rr-name">${t}</div>
+        ${num ? `<div class="rr-pirnum">${num}</div>` : ''}
+      </div>
       <div class="rr-arrows">
         <button class="arr-btn" onclick="moveUp(${i})" ${i === 0 ? 'disabled' : ''}>▲</button>
         <button class="arr-btn" onclick="moveDown(${i})" ${i === race.ranking.length - 1 ? 'disabled' : ''}>▼</button>

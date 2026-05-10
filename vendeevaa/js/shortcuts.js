@@ -18,7 +18,8 @@ document.addEventListener('keydown', e => {
 
   switch (e.key) {
     case 'Enter':
-      if (currentTab === 'encours') { e.preventDefault(); showBandeauCours(); }
+      if (currentTab === 'encours')    { e.preventDefault(); showBandeauCours(); }
+      else if (currentTab === 'classement') { e.preventDefault(); showClassement(); }
       break;
     case 'Escape':
       e.preventDefault();

@@ -117,9 +117,10 @@ body { background:var(--deep); color:var(--white); font-family:'Barlow',sans-ser
 .rr-num.n3 { color:rgba(195,155,75,.55); }
 .rr-handle { display:flex; align-items:center; padding:0 8px; color:rgba(122,160,192,.1); font-size:12px; letter-spacing:1px; cursor:grab; transition:color .15s; flex-shrink:0; }
 .rank-row:hover .rr-handle { color:rgba(122,160,192,.5); }
-.rr-name { flex:1; min-width:0; padding:0 8px; font-family:'Barlow Condensed',sans-serif; font-size:18px; font-weight:700; letter-spacing:.4px; text-transform:uppercase; color:rgba(255,255,255,.78); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.rr-name-group { flex:1; min-width:0; display:flex; align-items:center; gap:7px; padding:0 8px; overflow:hidden; }
+.rr-name { flex:0 1 auto; min-width:0; font-family:'Barlow Condensed',sans-serif; font-size:18px; font-weight:700; letter-spacing:.4px; text-transform:uppercase; color:rgba(255,255,255,.78); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
 .rr-first .rr-name { color:#fff; font-size:20px; }
-.rr-pirnum { width:30px; height:30px; border-radius:50%; border:1.5px solid rgba(68,144,200,.3); background:rgba(68,144,200,.06); display:flex; align-items:center; justify-content:center; font-family:'Barlow Condensed',sans-serif; font-size:12px; font-weight:900; color:rgba(68,144,200,.65); flex-shrink:0; margin:0 6px; }
+.rr-pirnum { width:30px; height:30px; border-radius:50%; border:1.5px solid rgba(68,144,200,.3); background:rgba(68,144,200,.06); display:flex; align-items:center; justify-content:center; font-family:'Barlow Condensed',sans-serif; font-size:12px; font-weight:900; color:rgba(68,144,200,.65); flex-shrink:0; }
 .rr-arrows { align-self:stretch; display:flex; flex-direction:column; border-left:1px solid var(--line); flex-shrink:0; }
 .arr-btn { flex:1; background:transparent; border:none; width:32px; display:flex; align-items:center; justify-content:center; cursor:pointer; color:rgba(122,160,192,.3); font-size:10px; transition:background .12s,color .12s; }
 .arr-btn:hover { background:rgba(45,110,168,.22); color:#fff; }
