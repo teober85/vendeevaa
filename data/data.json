@@ -103,11 +103,11 @@
     }
   },
   "overlay": {
-    "mode": "hidden",
+    "mode": "classement",
     "race": "large",
     "team": "",
     "place": 0,
-    "showAll": false,
+    "showAll": true,
     "sponsor": ""
   },
   "courseName": "Jeudi",
@@ -124,8 +124,9 @@
     }
   ],
   "colors": {
-    "primary": "#0f59a8",
+    "primary": "#2d6ea8",
     "accent": "#4490c8",
-    "background": "#070e1c"
+    "background": "#070e1c",
+    "text": "#ffffff"
   }
 }

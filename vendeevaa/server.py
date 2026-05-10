@@ -43,6 +43,7 @@ DEFAULT_STATE = {
         "primary":    "#2d6ea8",
         "accent":     "#4490c8",
         "background": "#070e1c",
+        "text":       "#ffffff",
     },
 }
 
@@ -251,7 +252,7 @@ async def ws_handler(websocket):
             # ── Couleurs ──────────────────────────────
             elif t == "set_colors":
                 colors = msg.get("colors", {})
-                for k in ("primary", "accent", "background"):
+                for k in ("primary", "accent", "background", "text"):
                     if k in colors:
                         state["colors"][k] = str(colors[k])
                 await broadcast_state()

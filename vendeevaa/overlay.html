@@ -268,12 +268,13 @@ function applyColors(colors) {
   const root = document.documentElement;
   if (colors.primary)    root.style.setProperty('--blue',  colors.primary);
   if (colors.accent)     root.style.setProperty('--blue3', colors.accent);
+  if (colors.text)       root.style.setProperty('--text',  colors.text);
   if (colors.background) {
     const hex = colors.background.replace('#','');
     const r = parseInt(hex.substr(0,2),16);
     const g = parseInt(hex.substr(2,2),16);
     const b = parseInt(hex.substr(4,2),16);
-    root.style.setProperty('--navy', `rgba(${r},${g},${b},.95)`);
+    root.style.setProperty('--navy', `rgb(${r},${g},${b})`);
   }
 }
 

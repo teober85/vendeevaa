@@ -96,7 +96,7 @@ function selectColorTarget(target) {
 }
 
 function syncColorSwatches() {
-  ['primary', 'accent', 'background'].forEach(k => {
+  ['primary', 'accent', 'background', 'text'].forEach(k => {
     const sw = document.getElementById('sw-' + k);
     if (sw) sw.style.background = overlayColors[k] || DEFAULT_COLORS[k];
   });
