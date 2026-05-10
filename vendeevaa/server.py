@@ -37,6 +37,11 @@ DEFAULT_STATE = {
         "sponsor": "",
     },
     "sponsors": [],
+    "colors": {
+        "primary":    "#2d6ea8",
+        "accent":     "#4490c8",
+        "background": "#070e1c",
+    },
 }
 
 # ─── Chargement / sauvegarde ──────────────────────────
@@ -204,6 +209,14 @@ async def ws_handler(websocket):
             # ── Sponsors ─────────────────────────────
             elif t == "set_sponsors":
                 state["sponsors"] = msg.get("sponsors", [])
+                await broadcast_state()
+
+            # ── Couleurs ──────────────────────────────
+            elif t == "set_colors":
+                colors = msg.get("colors", {})
+                for k in ("primary", "accent", "background"):
+                    if k in colors:
+                        state["colors"][k] = str(colors[k])
                 await broadcast_state()
 
             # ── Sauvegarde manuelle ───────────────────
