@@ -16,8 +16,9 @@ function renderAll() {
 }
 
 function renderTeamPool() {
-  const race = races[currentRace] || { teams: [], ranking: [], teamNumbers: {} };
+  const race = races[currentRace] || { teams: [], ranking: [], teamNumbers: {}, teamCountries: {} };
   const nums = race.teamNumbers || {};
+  const ctries = race.teamCountries || {};
   const el = document.getElementById('teamPool');
   const as = document.getElementById('addSel');
   as.innerHTML = '<option value="">Ajouter au classement...</option>'
@@ -26,6 +27,9 @@ function renderTeamPool() {
   el.innerHTML = race.teams.length ? race.teams.map(t => {
     const pos = race.ranking.indexOf(t), inR = pos >= 0;
     const num = nums[t] || '';
+    const ctry = ctries[t] || '';
+    const ctryOpts = '<option value="">—</option>'
+      + COUNTRIES.map(c => `<option value="${c.code}"${ctry === c.code ? ' selected' : ''}>${c.flag} ${c.label}</option>`).join('');
     return `<div class="chip">
       <div class="chip-pos ${inR ? 'ranked' : ''}">${inR ? pos + 1 : '—'}</div>
       <input class="chip-num-inp" type="text" value="${esc(num)}" placeholder="#" maxlength="4"
@@ -33,6 +37,9 @@ function renderTeamPool() {
              onchange="setTeamNumber('${esc(t)}',this.value)"
              onkeydown="if(event.key==='Enter')this.blur()"
              onclick="event.stopPropagation()">
+      <select class="chip-country-sel" title="Pays"
+              onchange="setTeamCountry('${esc(t)}',this.value)"
+              onclick="event.stopPropagation()">${ctryOpts}</select>
       <input class="chip-name-inp" value="${esc(t)}" maxlength="40"
              onchange="renameTeam('${esc(t)}',this)"
              onkeydown="if(event.key==='Enter')this.blur()"

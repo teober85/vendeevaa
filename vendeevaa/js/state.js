@@ -17,3 +17,11 @@ let currentCourseRace = 'medium';
 let showCourseRank = false;
 let titrages = [];
 let titrageOverlay = { visible: false, nom: '', titre: '' };
+
+const COUNTRIES = [
+  { code: 'DE', flag: '🇩🇪', label: 'Allemagne' },
+  { code: 'FR', flag: '🇫🇷', label: 'France' },
+  { code: 'CH', flag: '🇨🇭', label: 'Suisse' },
+  { code: 'PT', flag: '🇵🇹', label: 'Portugal' },
+  { code: 'PF', flag: '🇵🇫', label: 'Polynésie française' },
+];

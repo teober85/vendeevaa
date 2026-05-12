@@ -92,6 +92,9 @@ body { background:var(--deep); color:var(--white); font-family:'Barlow',sans-ser
 .chip-num-inp { width:36px; background:rgba(45,110,168,.07); border:1px solid rgba(45,110,168,.2); border-radius:4px; color:var(--blue3); font-family:'Barlow Condensed',sans-serif; font-size:13px; font-weight:800; text-align:center; padding:3px 2px; outline:none; flex-shrink:0; }
 .chip-num-inp::placeholder { color:rgba(122,160,192,.22); }
 .chip-num-inp:focus { border-color:var(--blue3); background:rgba(45,110,168,.15); }
+.chip-country-sel { width:52px; background:rgba(45,110,168,.07); border:1px solid rgba(45,110,168,.2); border-radius:4px; color:var(--white); font-size:14px; padding:2px 2px; outline:none; cursor:pointer; flex-shrink:0; appearance:none; text-align:center; }
+.chip-country-sel:focus { border-color:var(--blue3); }
+.chip-country-sel option { background:#0d1f38; font-size:13px; }
 .chip-name { flex:1; font-family:'Barlow Condensed',sans-serif; font-size:16px; font-weight:700; letter-spacing:.3px; text-transform:uppercase; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
 .chip-name-inp { flex:1; min-width:0; background:transparent; border:none; border-radius:3px; font-family:'Barlow Condensed',sans-serif; font-size:16px; font-weight:700; letter-spacing:.3px; text-transform:uppercase; color:rgba(255,255,255,.82); outline:none; padding:0 3px; cursor:pointer; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; transition:background .12s, color .12s; }
 .chip-name-inp:focus { background:rgba(45,110,168,.15); color:#fff; cursor:text; }
@@ -382,6 +385,8 @@ body.light .sel  { background:rgba(0,0,0,.04); color:var(--white);
   background-repeat:no-repeat; background-position:right 9px center;
 }
 body.light .sel option { background:#fff; color:#1a2638; }
+body.light .chip-country-sel { background:rgba(0,0,0,.04); color:var(--white); }
+body.light .chip-country-sel option { background:#fff; color:#1a2638; }
 
 /* Cards / rows */
 body.light .chip        { background:rgba(0,0,0,.04); }

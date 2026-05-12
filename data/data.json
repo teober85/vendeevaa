@@ -31,6 +31,7 @@
         "APATO’A VA’A": "26",
         "LECLERC VOYAGES VA’A API": "27"
       },
+      "teamCountries": {},
       "raceStatus": {}
     },
     "large": {
@@ -89,6 +90,19 @@
         "TU’AKI HOE": "13",
         "TEAM 31": "14"
       },
+      "teamCountries": {
+        "MOANA MANU NUI": "DE",
+        "NORD BASSIN VA’A": "FR",
+        "THE LOVEBOAT": "DE",
+        "UCKERDRACHEN": "DE",
+        "TE RANA TAHE": "CH",
+        "HEKE MOANA CHATEL": "FR",
+        "RIMA HERE VA’A": "FR",
+        "EDEN VA’A": "FR",
+        "RSCC-VA’A": "FR",
+        "LMVA’A": "FR",
+        "AUKAI CANOE CLUB": "PT"
+      },
       "raceStatus": {}
     },
     "selectif": {
@@ -98,16 +112,17 @@
       "teams": [],
       "ranking": [],
       "teamNumbers": {},
+      "teamCountries": {},
       "raceStatus": {},
       "enabled": false
     }
   },
   "overlay": {
-    "mode": "hidden",
+    "mode": "classement",
     "race": "large",
     "team": "",
     "place": 0,
-    "showAll": false,
+    "showAll": true,
     "sponsor": "",
     "showRank": false
   },

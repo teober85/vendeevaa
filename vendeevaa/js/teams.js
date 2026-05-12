@@ -69,6 +69,10 @@ function setTeamNumber(name, val) {
   send({ type: 'set_team_number', race: currentRace, name, number: val.trim() });
 }
 
+function setTeamCountry(name, val) {
+  send({ type: 'set_team_country', race: currentRace, name, country: val });
+}
+
 function renameTeam(oldName, input) {
   const newName = input.value.trim();
   if (!newName || newName === oldName) { input.value = oldName; return; }

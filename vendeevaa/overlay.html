@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <title>Vendée Va'a — Overlay</title>
 <link rel="stylesheet" href="/overlay.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/lipis/flag-icons@7.2.3/css/flag-icons.min.css">
 </head>
 <body>
 <div id="root">
@@ -118,13 +119,21 @@ function hideAll() {
     .forEach(id => hide(document.getElementById(id)));
 }
 
+/* ── Pays / drapeaux (flag-icons lipis) ── */
+const VALID_COUNTRIES = new Set(['DE','FR','CH','PT','PF']);
+function flagEl(code) {
+  if (!code || !VALID_COUNTRIES.has(code)) return '';
+  return `<span class="fi fi-${code.toLowerCase()} flag-img"></span>`;
+}
+
 /* ── Classement ──────────────────────────────── */
 function ordinal(n) { return n===1?'1re':n+'e'; }
 function rowGrade(i){ return i<=2?' r'+(i+1):''; }
 
-function renderClassement(ranking, teamNumbers, raceStatus) {
+function renderClassement(ranking, teamNumbers, raceStatus, teamCountries) {
   const nums = teamNumbers || {};
   const statuses = raceStatus || {};
+  const countries = teamCountries || {};
   const rows = document.getElementById('lbRows');
   const lbCols = document.querySelector('.lb-cols');
   rows.querySelectorAll('.lb-row.in').forEach(r => r.classList.replace('in','out'));
@@ -136,9 +145,11 @@ function renderClassement(ranking, teamNumbers, raceStatus) {
     function makeRow(name, i) {
       const num = nums[name] || '';
       const st = statuses[name] || '';
+      const flag = flagEl(countries[name] || '');
       return `<div class="lb-row${rowGrade(i)}${st?' status-'+st:''}" data-r>
         <div class="lb-rank">${i+1}</div>
         <div class="lb-name-wrap">
+          ${flag ? `<span class="lb-flag">${flag}</span>` : ''}
           <div class="lb-name">${name.toUpperCase()}</div>
           ${num ? `<div class="lb-num">${num}</div>` : ''}
         </div>
@@ -163,8 +174,14 @@ function renderClassement(ranking, teamNumbers, raceStatus) {
 }
 
 /* ── Bandeau course ──────────────────────────── */
-function renderBandeauCourse(teamName, pirNum, raceLabel, rank, showRank) {
-  document.getElementById('bcTeam').textContent = teamName.toUpperCase();
+function renderBandeauCourse(teamName, pirNum, raceLabel, rank, showRank, countryCode) {
+  const flag = flagEl(countryCode || '');
+  const bcTeamEl = document.getElementById('bcTeam');
+  if (flag) {
+    bcTeamEl.innerHTML = `<span class="bc-flag">${flag}</span>${teamName.toUpperCase()}`;
+  } else {
+    bcTeamEl.textContent = teamName.toUpperCase();
+  }
 
   const pirEl = document.getElementById('bcPirNum');
   if (pirEl) { pirEl.textContent = pirNum||''; pirEl.style.display = pirNum ? 'flex' : 'none'; }
@@ -209,7 +226,7 @@ function applyOverlay(st, state) {
     case 'classement':
       [bn,bc].forEach(hide);
       document.getElementById('lbRaceName').textContent = [cName, raceLabel].filter(Boolean).join('  ·  ');
-      renderClassement((race.ranking)||[], race.teamNumbers||{}, race.raceStatus||{});
+      renderClassement((race.ranking)||[], race.teamNumbers||{}, race.raceStatus||{}, race.teamCountries||{});
       show(lb);
       break;
     case 'arrivee': {
@@ -217,7 +234,13 @@ function applyOverlay(st, state) {
       document.getElementById('bnNum').textContent  = st.place;
       document.getElementById('bnNum').className    = 'bn-num'+(st.place===1?' p1':'');
       document.getElementById('bnSuf').textContent  = st.place===1?'ÈRE PLACE':'ÈME PLACE';
-      document.getElementById('bnName').textContent = (st.team||'').toUpperCase();
+      const bnFlag = flagEl((race.teamCountries||{})[st.team]||'');
+      const bnNameEl = document.getElementById('bnName');
+      if (bnFlag) {
+        bnNameEl.innerHTML = `<span class="bn-flag">${bnFlag}</span>${(st.team||'').toUpperCase()}`;
+      } else {
+        bnNameEl.textContent = (st.team||'').toUpperCase();
+      }
       document.getElementById('bnRaceLabel').textContent = [cName, raceLabel].filter(Boolean).join(' · ');
       const pirNum = (race.teamNumbers||{})[st.team]||'';
       const pirEl  = document.getElementById('bnPirNum');
@@ -231,7 +254,8 @@ function applyOverlay(st, state) {
       const raceLabel = (race.displayName || race.name || '') + dist2;
       const pirNum2 = (race.teamNumbers||{})[st.team]||'';
       const rankIdx = (race.ranking||[]).indexOf(st.team);
-      renderBandeauCourse(st.team||'', pirNum2, raceLabel, rankIdx >= 0 ? rankIdx + 1 : 0, !!st.showRank);
+      const ctryCode = (race.teamCountries||{})[st.team]||'';
+      renderBandeauCourse(st.team||'', pirNum2, raceLabel, rankIdx >= 0 ? rankIdx + 1 : 0, !!st.showRank, ctryCode);
       show(bc);
       break;
     }
@@ -273,11 +297,11 @@ function overlayDigest(msg) {
   const race = ((msg.races || {})[ov.race]) || {};
   const base = { ov, courseName: msg.courseName };
   if (mode === 'classement')
-    return JSON.stringify({ ...base, ranking: race.ranking, teamNumbers: race.teamNumbers, raceStatus: race.raceStatus, displayName: race.displayName, distance: race.distance });
+    return JSON.stringify({ ...base, ranking: race.ranking, teamNumbers: race.teamNumbers, teamCountries: race.teamCountries, raceStatus: race.raceStatus, displayName: race.displayName, distance: race.distance });
   if (mode === 'arrivee')
-    return JSON.stringify({ ...base, teamNumbers: race.teamNumbers, displayName: race.displayName, distance: race.distance });
+    return JSON.stringify({ ...base, teamNumbers: race.teamNumbers, teamCountries: race.teamCountries, displayName: race.displayName, distance: race.distance });
   if (mode === 'bandeau_course')
-    return JSON.stringify({ ...base, teamNumbers: race.teamNumbers, displayName: race.displayName, distance: race.distance, ranking: race.ranking });
+    return JSON.stringify({ ...base, teamNumbers: race.teamNumbers, teamCountries: race.teamCountries, displayName: race.displayName, distance: race.distance, ranking: race.ranking });
   return JSON.stringify(ov);
 }
 
