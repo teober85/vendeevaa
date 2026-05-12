@@ -113,6 +113,7 @@ function renderCourseList() {
 
 function renderSponsors() {
   const el = document.getElementById('sponsorsList');
+  if (!el) return;
   el.innerHTML = sponsors.length ? sponsors.map((sp, i) => `
     <div class="sponsor-item">
       <div class="sponsor-top">
@@ -130,6 +131,7 @@ function renderSponsors() {
     </div>`).join('') : '<div class="empty">Aucun partenaire — cliquez "+ Ajouter"</div>';
 
   const selEl = document.getElementById('selSponsor');
+  if (!selEl) return;
   const sv = selEl.value;
   selEl.innerHTML = '<option value="">Partenaire à afficher...</option>'
     + sponsors.map(s => `<option value="${esc(s.nom)}" ${sv === s.nom ? 'selected' : ''}>${s.nom}</option>`).join('');
