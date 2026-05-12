@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Vendée Va'a — Régie</title>
+<link rel="stylesheet" href="/regie.css">
+</head>
+<body>
+
+<!-- TOPBAR -->
+<div class="topbar">
+  <img src="/logo.png" style="height:34px;object-fit:contain;display:block;"/>
+  <div class="tb-sep"></div>
+  <span class="tb-lbl">Panneau de Régie</span>
+  <div class="tb-right">
+    <button class="save-btn" onclick="copyObs()">URL Overlay</button>
+    <button class="save-btn" id="saveBtn" onclick="manualSave()">Sauvegarder</button>
+    <button class="save-btn" id="themeToggle" onclick="toggleTheme()">☀ Clair</button>
+    <button class="save-btn" onclick="toggleShortcuts()" title="Raccourcis clavier">⌨ Aide</button>
+    <div class="ws-badge" id="wsBadge"><div class="wdot blink"></div><span id="wsLabel">Connexion...</span></div>
+  </div>
+</div>
+
+<!-- TABS -->
+<div class="tabs">
+  <div class="tab active" onclick="switchTab('classement')" id="tab-classement">
+    <div class="tab-dot"></div>Classement
+  </div>
+  <div class="tab" onclick="switchTab('encours')" id="tab-encours">
+    <div class="tab-dot"></div>En course
+  </div>
+  <div class="tab" onclick="switchTab('titrage')" id="tab-titrage">
+    <div class="tab-dot"></div>Titrage
+  </div>
+  <div class="tab" onclick="switchTab('couleurs')" id="tab-couleurs">
+    Couleurs
+  </div>
+</div>
+
+<div class="content-area">
+
+<!-- ════════════════════════════════════════════
+  ONGLET 1 — CLASSEMENT
+════════════════════════════════════════════ -->
+<div class="tab-panel active" id="panel-classement">
+<div style="display:flex;flex:1;overflow:hidden">
+
+<!-- Nav courses verticale -->
+<div class="race-nav">
+  <div class="race-tab active" onclick="switchRace('medium')" id="rtab-medium">
+    <div class="tab-dot"></div>Medium
+  </div>
+  <div class="race-tab" onclick="switchRace('large')" id="rtab-large">
+    <div class="tab-dot"></div>Large
+  </div>
+  <div class="race-tab" onclick="switchRace('selectif')" id="rtab-selectif">
+    <div class="tab-dot"></div>Sélectif
+    <span class="race-badge" id="selectifBadge">OFF</span>
+  </div>
+</div>
+
+<!-- Panneau réglages (masqué par défaut) -->
+<div class="settings-panel" id="settingsPanel">
+  <div class="col-head" style="flex-shrink:0">
+    <div style="display:flex;align-items:center;gap:8px">
+      <div style="flex:1">
+        <div class="col-head-title">Réglages</div>
+        <div class="col-head-desc" id="settingsRaceLabel">—</div>
+      </div>
+      <button class="icon-btn action" onclick="toggleSettings()" title="Fermer">✕</button>
+    </div>
+  </div>
+  <div style="padding:6px 12px 2px;flex-shrink:0"><div class="sec-lbl">Événement</div></div>
+  <div class="field">
+    <input type="text" class="inp" id="courseNameInput" placeholder="Jeudi" maxlength="30"/>
+    <button class="btn btn-muted" onclick="saveCourseName()">OK</button>
+  </div>
+  <div class="field" id="selectifRow" style="display:none;align-items:center">
+    <span style="flex:1;font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--mist)">Sélectif National</span>
+    <button class="btn btn-muted" id="selectifToggleBtn" onclick="toggleSelectif()">Activer</button>
+  </div>
+  <div class="field">
+    <input type="text" class="inp" id="displayNameInput" placeholder="Nom affiché sur l'overlay..." maxlength="30"/>
+    <button class="btn btn-muted" onclick="saveDisplayName()">OK</button>
+  </div>
+  <div style="padding:3px 12px 0;flex-shrink:0">
+    <span style="font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:rgba(122,160,192,.35)">Distance (km)</span>
+  </div>
+  <div class="field">
+    <input type="text" class="inp" id="distanceInput" placeholder="ex : 12.5" maxlength="20"/>
+    <button class="btn btn-muted" onclick="saveDistance()">OK</button>
+  </div>
+  <div style="padding:6px 12px 2px;flex-shrink:0"><div class="sec-lbl">Classement</div></div>
+  <div class="field">
+    <select class="sel" id="addSel"><option value="">Ajouter au classement...</option></select>
+    <button class="btn btn-blue" onclick="addToRanking()">+</button>
+  </div>
+  <div style="padding:6px 12px 2px;flex-shrink:0"><div class="sec-lbl">Pirogues</div></div>
+  <div class="field">
+    <input type="text" class="inp" id="teamInput" placeholder="Nom de la pirogue..." maxlength="40"/>
+    <button class="btn btn-blue" onclick="addTeam()">Ajouter</button>
+  </div>
+  <div class="col-body" id="teamPool"><div class="empty">Aucune pirogue</div></div>
+</div>
+
+<!-- Vue live : classement + diffusion -->
+<div style="display:flex;flex:1;overflow:hidden" id="splitPane">
+
+  <!-- Classement -->
+  <div class="col" id="splitLeft" style="flex:0 0 480px;min-width:180px">
+    <div class="col-head">
+      <div style="display:flex;align-items:center;gap:10px">
+        <div style="flex:1">
+          <div class="col-head-title">Classement officiel</div>
+          <div class="col-head-desc">Glisser-déposer ou flèches ▲▼</div>
+        </div>
+        <button class="btn btn-muted" onclick="toggleSettings()" id="settingsBtn">⚙ Réglages</button>
+      </div>
+    </div>
+    <div class="col-body" id="rankList"
+         ondragover="onDragOver(event)" ondrop="onDrop(event)">
+      <div class="empty">Aucune pirogue classée</div>
+    </div>
+  </div>
+
+  <!-- Séparateur redimensionnable -->
+  <div class="split-handle" id="splitHandle"><div class="split-grip"></div></div>
+
+  <!-- Diffusion -->
+  <div class="col ob-col" id="splitRight">
+    <div class="preview-wrap">
+      <div class="preview-label">Aperçu live</div>
+      <iframe src="/overlay" class="preview-iframe" scrolling="no"></iframe>
+      <div class="preview-btns">
+        <button class="preview-btn" onclick="previewPopout()" title="Agrandir">⤢</button>
+        <button class="preview-btn" onclick="previewFullscreen(this)" title="Plein écran">⛶</button>
+      </div>
+    </div>
+    <div class="ob-panel">
+      <div class="ob-status">
+        <div class="ob-dot" id="stDotC"></div>
+        <span class="ob-status-txt" id="stValC">Masqué</span>
+      </div>
+      <div class="ob-action">
+        <button class="ob-btn ob-blue" id="btnC" onclick="showClassement()">Classement</button>
+      </div>
+      <div class="ob-action">
+        <div class="ob-arrival-row">
+          <select class="sel" id="bnTeam"><option value="">Pirogue...</option></select>
+          <input type="number" class="ob-place-inp" id="bnPlace" min="1" value="1"
+                 title="Place (préselection auto, modifiable)">
+        </div>
+        <button class="ob-btn ob-green" id="btnB" onclick="showBanner()" style="margin-top:8px">Arrivée</button>
+      </div>
+      <div class="ob-action">
+        <button class="ob-btn ob-red" onclick="hideAll()">Masquer</button>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /vue live -->
+</div><!-- /flex wrapper -->
+</div><!-- /panel-classement -->
+
+<!-- ════════════════════════════════════════════
+  ONGLET 2 — EN COURSE
+════════════════════════════════════════════ -->
+<div class="tab-panel" id="panel-encours">
+<div style="display:flex;flex:1;overflow:hidden">
+
+  <!-- Nav courses verticale -->
+  <div class="race-nav">
+    <div class="race-tab active" onclick="switchCourseRace('medium')" id="crtab-medium">
+      <div class="tab-dot"></div>Medium
+    </div>
+    <div class="race-tab" onclick="switchCourseRace('large')" id="crtab-large">
+      <div class="tab-dot"></div>Large
+    </div>
+    <div class="race-tab" onclick="switchCourseRace('selectif')" id="crtab-selectif">
+      <div class="tab-dot"></div>Sélectif
+    </div>
+  </div>
+
+  <!-- Split redimensionnable -->
+  <div style="display:flex;flex:1;overflow:hidden" id="courseSplitPane">
+
+    <!-- Colonne gauche : liste pirogues -->
+    <div class="col" id="courseSplitLeft" style="flex:0 0 400px;min-width:180px">
+      <div class="col-head">
+        <div class="col-head-title">Pirogues</div>
+        <div class="col-head-desc">Dans l'ordre du classement</div>
+      </div>
+      <div class="col-body" id="coursePirogueList"><div class="empty">Aucune pirogue</div></div>
+    </div>
+
+    <!-- Séparateur redimensionnable -->
+    <div class="split-handle" id="courseSplitHandle"><div class="split-grip"></div></div>
+
+    <!-- Colonne droite : aperçu + diffusion (même structure que Classement) -->
+    <div class="col ob-col">
+      <div class="preview-wrap">
+        <div class="preview-label">Aperçu live</div>
+        <iframe src="/overlay" class="preview-iframe" scrolling="no"></iframe>
+        <div class="preview-btns">
+          <button class="preview-btn" onclick="previewPopout()" title="Agrandir">⤢</button>
+          <button class="preview-btn" onclick="previewFullscreen(this)" title="Plein écran">⛶</button>
+        </div>
+      </div>
+      <div class="ob-panel">
+        <div class="ob-status">
+          <div class="ob-dot" id="stDotCours"></div>
+          <span class="ob-status-txt" id="stValCours"
+                data-selected="" data-race="medium"
+                style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Aucune</span>
+        </div>
+        <div class="ob-action">
+          <div class="cours-rank-toggle">
+            <span>Afficher rang</span>
+            <button class="btn btn-muted" id="rankToggleBtn" onclick="toggleCourseRank()">Non</button>
+          </div>
+          <button class="ob-btn ob-green" id="btnCours" onclick="showBandeauCours()">Diffuser</button>
+        </div>
+        <div class="ob-action">
+          <button class="ob-btn ob-red" onclick="hideAll()">Masquer</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+</div>
+</div><!-- /panel-encours -->
+
+<!-- ════════════════════════════════════════════
+  ONGLET — TITRAGE
+════════════════════════════════════════════ -->
+<div class="tab-panel" id="panel-titrage">
+<div style="display:flex;flex:1;overflow:hidden">
+
+  <!-- Noms enregistrés -->
+  <div class="col" style="flex:0 0 280px;min-width:180px">
+    <div class="col-head">
+      <div class="col-head-title">Noms enregistrés</div>
+      <div class="col-head-desc">Cliquer pour sélectionner</div>
+    </div>
+    <div class="col-body" id="titrageList">
+      <div class="empty">Aucun nom enregistré</div>
+    </div>
+  </div>
+
+  <!-- Aperçu + diffusion -->
+  <div class="col ob-col">
+    <div class="preview-wrap">
+      <div class="preview-label">Aperçu live</div>
+      <iframe src="/overlay" class="preview-iframe" scrolling="no"></iframe>
+      <div class="preview-btns">
+        <button class="preview-btn" onclick="previewPopout()" title="Agrandir">⤢</button>
+        <button class="preview-btn" onclick="previewFullscreen(this)" title="Plein écran">⛶</button>
+      </div>
+    </div>
+    <div class="ob-panel">
+      <div class="ob-status">
+        <div class="ob-dot" id="stDotTit"></div>
+        <span class="ob-status-txt" id="stValTit">Masqué</span>
+      </div>
+      <div class="ob-action">
+        <input type="text" class="inp" id="titrageNomInput" placeholder="Nom Prénom..." maxlength="50"
+               style="margin-bottom:8px"
+               onkeydown="if(event.key==='Enter')showTitrage()"/>
+        <input type="text" class="inp" id="titrageRoleInput" placeholder="Titre / Fonction..." maxlength="60"
+               style="margin-bottom:10px"
+               onkeydown="if(event.key==='Enter')showTitrage()"/>
+        <div style="display:flex;gap:8px">
+          <button class="ob-btn ob-green" id="btnTit" onclick="showTitrage()" style="flex:1">Diffuser</button>
+          <button class="btn btn-muted" onclick="saveTitrage()">Enregistrer</button>
+        </div>
+      </div>
+      <div class="ob-action">
+        <button class="ob-btn ob-red" onclick="hideTitrage()">Masquer</button>
+      </div>
+    </div>
+  </div>
+
+</div>
+</div><!-- /panel-titrage -->
+
+<!-- ════════════════════════════════════════════
+  ONGLET — COULEURS
+════════════════════════════════════════════ -->
+<div class="tab-panel" id="panel-couleurs">
+<div class="cp-page">
+  <div class="sec-lbl">Couleur à modifier</div>
+  <div class="cp-targets">
+    <button class="cp-target active" id="cpt-primary" onclick="selectColorTarget('primary')">
+      <div class="cp-swatch" id="sw-primary"></div>Principale
+    </button>
+    <button class="cp-target" id="cpt-accent" onclick="selectColorTarget('accent')">
+      <div class="cp-swatch" id="sw-accent"></div>Accent
+    </button>
+    <button class="cp-target" id="cpt-background" onclick="selectColorTarget('background')">
+      <div class="cp-swatch" id="sw-background"></div>Fond
+    </button>
+    <button class="cp-target" id="cpt-text" onclick="selectColorTarget('text')">
+      <div class="cp-swatch" id="sw-text"></div>Texte
+    </button>
+  </div>
+
+  <div class="cp-picker-row">
+    <canvas id="cpWheel" width="200" height="200" style="border-radius:50%;cursor:crosshair;flex-shrink:0"></canvas>
+    <canvas id="cpSlider" width="28" height="200" style="border-radius:5px;cursor:ns-resize;flex-shrink:0"></canvas>
+    <div class="cp-right">
+      <div class="cp-preview" id="cpPreview"></div>
+      <div class="cp-hex-row">
+        <span class="cp-hash">#</span>
+        <input class="inp cp-hex-inp" id="cpHex" maxlength="6" placeholder="2d6ea8">
+      </div>
+      <div class="cp-rgb-row">
+        <label class="cp-rgb-lbl">R<input class="inp cp-num" type="number" id="cpR" min="0" max="255"></label>
+        <label class="cp-rgb-lbl">G<input class="inp cp-num" type="number" id="cpG" min="0" max="255"></label>
+        <label class="cp-rgb-lbl">B<input class="inp cp-num" type="number" id="cpB" min="0" max="255"></label>
+      </div>
+      <button class="btn btn-blue" style="width:100%" onclick="sendColors()">Appliquer à l'overlay</button>
+    </div>
+  </div>
+</div>
+</div><!-- /panel-couleurs -->
+
+</div><!-- /content-area -->
+
+<!-- Hidden file input pour photos -->
+<input type="file" id="fileInput" accept="image/*" style="display:none"/>
+
+<!-- MODAL PREVIEW -->
+<div class="preview-modal" id="previewModal" onclick="closePreviewModal(event)">
+  <div class="preview-modal-box">
+    <button class="preview-modal-close" onclick="closePreviewModal()" title="Fermer">✕</button>
+    <iframe src="/overlay" class="preview-modal-iframe" scrolling="no"></iframe>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<!-- MODAL SHORTCUTS -->
+<div class="sc-modal" id="shortcutsModal" onclick="closeShortcuts(event)">
+  <div class="sc-box">
+    <div class="sc-head">
+      <span>Raccourcis clavier</span>
+      <button class="sc-close" onclick="closeShortcuts()">✕</button>
+    </div>
+    <div class="sc-body">
+      <div class="sc-group">Diffusion</div>
+      <div class="sc-row"><div class="sc-keys"><kbd>C</kbd></div><span>Afficher le classement</span></div>
+      <div class="sc-row"><div class="sc-keys"><kbd>A</kbd></div><span>Bandeau arrivée (pirogue sélectionnée)</span></div>
+      <div class="sc-row"><div class="sc-keys"><kbd>E</kbd></div><span>Bandeau en cours (pirogue sélectionnée)</span></div>
+      <div class="sc-row"><div class="sc-keys"><kbd>Entrée</kbd></div><span>Diffuser (onglets Classement &amp; En course)</span></div>
+      <div class="sc-row"><div class="sc-keys"><kbd>Suppr</kbd></div><span>Masquer l'overlay</span></div>
+      <div class="sc-row"><div class="sc-keys"><kbd>Échap</kbd></div><span>Masquer l'overlay / fermer</span></div>
+      <div class="sc-group">Navigation courses</div>
+      <div class="sc-row"><div class="sc-keys"><kbd>1</kbd></div><span>Course Medium</span></div>
+      <div class="sc-row"><div class="sc-keys"><kbd>2</kbd></div><span>Course Large</span></div>
+      <div class="sc-row"><div class="sc-keys"><kbd>3</kbd></div><span>Course Sélectif</span></div>
+      <div class="sc-row"><div class="sc-keys"><kbd>←</kbd><kbd>→</kbd></div><span>Course précédente / suivante</span></div>
+      <div class="sc-group">Interface</div>
+      <div class="sc-row"><div class="sc-keys"><kbd>S</kbd></div><span>Ouvrir / fermer les réglages</span></div>
+      <div class="sc-row"><div class="sc-keys"><kbd>?</kbd></div><span>Cette aide</span></div>
+    </div>
+  </div>
+</div>
+
+<script src="/js/state.js"></script>
+<script src="/js/utils.js"></script>
+<script src="/js/ws.js"></script>
+<script src="/js/render.js"></script>
+<script src="/js/teams.js"></script>
+<script src="/js/broadcast.js"></script>
+<script src="/js/titrages.js"></script>
+<script src="/js/colorpicker.js"></script>
+<script src="/js/ui.js"></script>
+<script src="/js/shortcuts.js"></script>
+<script src="/js/main.js"></script>
+</body>
+</html>

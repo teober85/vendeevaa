@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<title>Vendée Va'a — Overlay</title>
+<link rel="stylesheet" href="/overlay.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/lipis/flag-icons@7.2.3/css/flag-icons.min.css">
+</head>
+<body>
+<div id="root">
+
+<!-- 1. CLASSEMENT -->
+<div id="leaderboard">
+  <svg class="lb-logo-bg" viewBox="0 0 380 62" xmlns="http://www.w3.org/2000/svg" fill="none">
+    <path d="M2 22 C8 17 14 17 20 22 C26 27 32 27 38 22" stroke="#2d6ea8" stroke-width="3.5" stroke-linecap="round"/>
+    <path d="M2 30 C8 25 14 25 20 30 C26 35 32 35 38 30" stroke="#2d6ea8" stroke-width="3.5" stroke-linecap="round"/>
+    <path d="M6 38 C12 33 18 33 24 38 C30 43 36 43 38 40" stroke="#2d6ea8" stroke-width="3.5" stroke-linecap="round"/>
+    <path d="M2 22 C-2 14 2 6 10 8 C16 10 22 14 20 22" stroke="#2d6ea8" stroke-width="2.2" stroke-linecap="round" opacity="0.6"/>
+    <text x="48" y="37" font-family="Georgia,serif" font-size="34" font-weight="700" fill="#2d6ea8" letter-spacing="1" font-style="italic">Vendée Va'a</text>
+    <path d="M48 43 Q180 47 295 43" stroke="#2d6ea8" stroke-width="0.8" opacity="0.5"/>
+    <text x="52" y="57" font-family="Georgia,serif" font-size="10" fill="#2d6ea8" letter-spacing="4">Les Sables d'Olonne</text>
+    <path d="M305 22 C311 17 317 17 323 22 C329 27 335 27 341 22" stroke="#2d6ea8" stroke-width="3.5" stroke-linecap="round"/>
+    <path d="M305 30 C311 25 317 25 323 30 C329 35 335 35 341 30" stroke="#2d6ea8" stroke-width="3.5" stroke-linecap="round"/>
+    <path d="M305 40 C311 33 317 33 323 38 C329 43 335 43 341 38" stroke="#2d6ea8" stroke-width="3.5" stroke-linecap="round"/>
+    <path d="M341 22 C345 14 341 6 333 8 C327 10 321 14 323 22" stroke="#2d6ea8" stroke-width="2.2" stroke-linecap="round" opacity="0.6"/>
+  </svg>
+  <div class="lb-head">
+    <div class="lb-sub" id="lbCourseName"></div>
+    <div class="lb-tit" id="lbRaceName">—</div>
+  </div>
+  <div class="lb-body">
+    <div class="lb-cols">
+      <span class="lb-col">Position</span>
+      <span class="lb-col">Pirogue</span>
+    </div>
+    <div id="lbRows"></div>
+  </div>
+</div>
+
+<!-- 2. BANDEAU ARRIVÉE -->
+<div id="banner">
+  <div class="bn-stripe">
+    <span class="bn-slbl">Arrivée</span>
+    <div class="bn-ssep"></div>
+    <span class="bn-sev" id="bnRaceLabel">Vendée Va'a — Les Sables d'Olonne</span>
+  </div>
+  <div class="bn-body">
+    <div class="bn-place">
+      <div class="bn-num" id="bnNum">1</div>
+      <div class="bn-suf" id="bnSuf">ÈRE PLACE</div>
+    </div>
+    <div class="bn-team">
+      <div style="display:flex;align-items:center;gap:10px">
+        <div class="bn-lbl">Pirogue</div>
+        <div class="bn-pirnum" id="bnPirNum" style="display:none"></div>
+      </div>
+      <div class="bn-name" id="bnName">—</div>
+    </div>
+  </div>
+  <div class="bn-foot"></div>
+</div>
+
+<!-- 3. BANDEAU EN COURSE -->
+<div id="bandeau-course">
+  <div class="bc-wrap">
+    <div class="bc-label">
+      <span class="bc-label-txt">En course</span>
+    </div>
+    <div class="bc-body">
+      <div class="bc-info" id="bcInfo"></div>
+      <div class="bc-sep" id="bcSep"></div>
+      <div class="bc-team-group">
+        <div class="bc-rank" id="bcRank"></div>
+        <div class="bc-team" id="bcTeam">—</div>
+        <div class="bc-pirnum" id="bcPirNum" style="display:none"></div>
+      </div>
+      <div class="bc-foot"></div>
+    </div>
+  </div>
+</div>
+
+<!-- 4. TITRAGE -->
+<div id="titrage">
+  <div class="tit-stripe"></div>
+  <div class="tit-body">
+    <div class="tit-name" id="titName"></div>
+    <div class="tit-role" id="titRole"></div>
+  </div>
+  <div class="tit-foot"></div>
+</div>
+
+</div><!-- /root -->
+
+<script>
+const WS_URL = (location.hostname === 'localhost' || location.hostname === '127.0.0.1')
+  ? 'ws://localhost:8766'
+  : (location.protocol === 'https:' ? 'wss://' : 'ws://') + location.host + '/ws';
+let fullState = null;
+
+/* ── Utilitaires animation ────────────────────── */
+function show(el) {
+  clearTimeout(el._ht);
+  el.style.display = '';
+  el.classList.remove('hide', 'vis');
+  void el.offsetWidth;
+  el.classList.add('vis');
+}
+function hide(el) {
+  el.classList.remove('vis');
+  el.classList.add('hide');
+  clearTimeout(el._ht);
+  el._ht = setTimeout(() => {
+    if (el.classList.contains('hide') && !el.classList.contains('vis'))
+      el.style.display = 'none';
+  }, 700);
+}
+function hideAll() {
+  ['leaderboard','banner','bandeau-course']
+    .forEach(id => hide(document.getElementById(id)));
+}
+
+/* ── Pays / drapeaux (flag-icons lipis) ── */
+const VALID_COUNTRIES = new Set(['DE','FR','CH','PT','PF']);
+function flagEl(code) {
+  if (!code || !VALID_COUNTRIES.has(code)) return '';
+  return `<span class="fi fi-${code.toLowerCase()} flag-img"></span>`;
+}
+
+/* ── Classement ──────────────────────────────── */
+function ordinal(n) { return n===1?'1re':n+'e'; }
+function rowGrade(i){ return i<=2?' r'+(i+1):''; }
+
+function renderClassement(ranking, teamNumbers, raceStatus, teamCountries) {
+  const nums = teamNumbers || {};
+  const statuses = raceStatus || {};
+  const countries = teamCountries || {};
+  const rows = document.getElementById('lbRows');
+  const lbCols = document.querySelector('.lb-cols');
+  rows.querySelectorAll('.lb-row.in').forEach(r => r.classList.replace('in','out'));
+  setTimeout(() => {
+    const twoCol = ranking.length > 7;
+    const mid = Math.ceil(ranking.length / 2);
+    if (lbCols) lbCols.style.display = twoCol ? 'none' : '';
+
+    function makeRow(name, i) {
+      const num = nums[name] || '';
+      const st = statuses[name] || '';
+      const flag = flagEl(countries[name] || '');
+      return `<div class="lb-row${rowGrade(i)}${st?' status-'+st:''}" data-r>
+        <div class="lb-rank">${i+1}</div>
+        <div class="lb-name-wrap">
+          ${flag ? `<span class="lb-flag">${flag}</span>` : ''}
+          <div class="lb-name">${name.toUpperCase()}</div>
+          ${num ? `<div class="lb-num">${num}</div>` : ''}
+        </div>
+      </div>`;
+    }
+
+    if (twoCol) {
+      const left  = ranking.slice(0, mid).map((n, i) => makeRow(n, i)).join('');
+      const right = ranking.slice(mid).map((n, i) => makeRow(n, mid + i)).join('');
+      rows.innerHTML = `<div class="lb-col-split">${left}</div><div class="lb-col-split">${right}</div>`;
+    } else {
+      rows.innerHTML = ranking.map((n, i) => makeRow(n, i)).join('');
+    }
+    rows.classList.toggle('two-col', twoCol);
+
+    requestAnimationFrame(() => {
+      rows.querySelectorAll('[data-r]').forEach((r,i) => {
+        setTimeout(() => r.classList.add('in'), i*80);
+      });
+    });
+  }, 200);
+}
+
+/* ── Bandeau course ──────────────────────────── */
+function renderBandeauCourse(teamName, pirNum, raceLabel, rank, showRank, countryCode) {
+  const flag = flagEl(countryCode || '');
+  const bcTeamEl = document.getElementById('bcTeam');
+  if (flag) {
+    bcTeamEl.innerHTML = `<span class="bc-flag">${flag}</span>${teamName.toUpperCase()}`;
+  } else {
+    bcTeamEl.textContent = teamName.toUpperCase();
+  }
+
+  const pirEl = document.getElementById('bcPirNum');
+  if (pirEl) { pirEl.textContent = pirNum||''; pirEl.style.display = pirNum ? 'flex' : 'none'; }
+
+  const infoEl = document.getElementById('bcInfo');
+  if (infoEl) infoEl.textContent = raceLabel || '';
+
+  const sepEl = document.getElementById('bcSep');
+  if (sepEl) sepEl.style.display = raceLabel ? 'block' : 'none';
+
+  const rankEl = document.getElementById('bcRank');
+  if (rankEl) {
+    rankEl.textContent = rank > 0 ? rank : '';
+    rankEl.style.display = (showRank && rank > 0) ? 'flex' : 'none';
+  }
+}
+
+/* ── Helpers course ──────────────────────────── */
+function getRace(raceId) {
+  return (fullState && fullState.races && fullState.races[raceId]) || {};
+}
+
+/* ── Application de l'état overlay ──────────── */
+function applyOverlay(st, state) {
+  const lb = document.getElementById('leaderboard');
+  const bn = document.getElementById('banner');
+  const bc = document.getElementById('bandeau-course');
+
+  const all = [lb,bn,bc];
+
+  if (!st.mode || st.mode==='hidden') {
+    all.forEach(hide); return;
+  }
+
+  const race = getRace(st.race);
+  const displayName = race.displayName || race.name || '';
+  const dist = race.distance ? ' · ' + race.distance + ' km' : '';
+  const raceLabel = displayName + dist;
+  const cName = (state.courseName || '').toUpperCase();
+
+  switch(st.mode) {
+    case 'classement':
+      [bn,bc].forEach(hide);
+      document.getElementById('lbRaceName').textContent = [cName, raceLabel].filter(Boolean).join('  ·  ');
+      renderClassement((race.ranking)||[], race.teamNumbers||{}, race.raceStatus||{}, race.teamCountries||{});
+      show(lb);
+      break;
+    case 'arrivee': {
+      [lb,bc].forEach(hide);
+      document.getElementById('bnNum').textContent  = st.place;
+      document.getElementById('bnNum').className    = 'bn-num'+(st.place===1?' p1':'');
+      document.getElementById('bnSuf').textContent  = st.place===1?'ÈRE PLACE':'ÈME PLACE';
+      const bnFlag = flagEl((race.teamCountries||{})[st.team]||'');
+      const bnNameEl = document.getElementById('bnName');
+      if (bnFlag) {
+        bnNameEl.innerHTML = `<span class="bn-flag">${bnFlag}</span>${(st.team||'').toUpperCase()}`;
+      } else {
+        bnNameEl.textContent = (st.team||'').toUpperCase();
+      }
+      document.getElementById('bnRaceLabel').textContent = [cName, raceLabel].filter(Boolean).join(' · ');
+      const pirNum = (race.teamNumbers||{})[st.team]||'';
+      const pirEl  = document.getElementById('bnPirNum');
+      pirEl.textContent = pirNum; pirEl.style.display = pirNum ? 'flex' : 'none';
+      show(bn);
+      break;
+    }
+    case 'bandeau_course': {
+      [lb,bn].forEach(hide);
+      const dist2 = race.distance ? ' · ' + race.distance + ' km' : '';
+      const raceLabel = (race.displayName || race.name || '') + dist2;
+      const pirNum2 = (race.teamNumbers||{})[st.team]||'';
+      const rankIdx = (race.ranking||[]).indexOf(st.team);
+      const ctryCode = (race.teamCountries||{})[st.team]||'';
+      renderBandeauCourse(st.team||'', pirNum2, raceLabel, rankIdx >= 0 ? rankIdx + 1 : 0, !!st.showRank, ctryCode);
+      show(bc);
+      break;
+    }
+  }
+}
+
+/* ── Couleurs dynamiques ─────────────────────── */
+function applyColors(colors) {
+  if (!colors) return;
+  const root = document.documentElement;
+  if (colors.primary)    root.style.setProperty('--blue',  colors.primary);
+  if (colors.accent)     root.style.setProperty('--blue3', colors.accent);
+  if (colors.text)       root.style.setProperty('--text',  colors.text);
+  if (colors.background) {
+    const hex = colors.background.replace('#','');
+    const r = parseInt(hex.substr(0,2),16);
+    const g = parseInt(hex.substr(2,2),16);
+    const b = parseInt(hex.substr(4,2),16);
+    root.style.setProperty('--navy', `rgb(${r},${g},${b})`);
+  }
+}
+
+/* ── Scale automatique ───────────────────────── */
+function updateScale() {
+  const s = Math.min(window.innerWidth / 1920, window.innerHeight / 1080);
+  const root = document.getElementById('root');
+  root.style.transform = `scale(${s})`;
+  root.style.left = Math.round((window.innerWidth  - 1920 * s) / 2) + 'px';
+  root.style.top  = Math.round((window.innerHeight - 1080 * s) / 2) + 'px';
+}
+window.addEventListener('resize', updateScale);
+updateScale();
+
+/* ── Digest : résumé des données utiles à l'overlay ── */
+function overlayDigest(msg) {
+  const ov = msg.overlay || {};
+  const mode = ov.mode || 'hidden';
+  if (mode === 'hidden') return '{"mode":"hidden"}';
+  const race = ((msg.races || {})[ov.race]) || {};
+  const base = { ov, courseName: msg.courseName };
+  if (mode === 'classement')
+    return JSON.stringify({ ...base, ranking: race.ranking, teamNumbers: race.teamNumbers, teamCountries: race.teamCountries, raceStatus: race.raceStatus, displayName: race.displayName, distance: race.distance });
+  if (mode === 'arrivee')
+    return JSON.stringify({ ...base, teamNumbers: race.teamNumbers, teamCountries: race.teamCountries, displayName: race.displayName, distance: race.distance });
+  if (mode === 'bandeau_course')
+    return JSON.stringify({ ...base, teamNumbers: race.teamNumbers, teamCountries: race.teamCountries, displayName: race.displayName, distance: race.distance, ranking: race.ranking });
+  return JSON.stringify(ov);
+}
+
+/* ── Titrage ─────────────────────────────────── */
+function applyTitrage(tov) {
+  const el = document.getElementById('titrage');
+  if (!el) return;
+  if (!tov || !tov.visible) { hide(el); return; }
+  document.getElementById('titName').textContent = (tov.nom || '').toUpperCase();
+  const roleEl = document.getElementById('titRole');
+  if (roleEl) { roleEl.textContent = tov.titre || ''; roleEl.style.display = tov.titre ? '' : 'none'; }
+  show(el);
+}
+
+/* ── WebSocket ───────────────────────────────── */
+let lastDigest = null;
+let lastTitrageDigest = null;
+
+function connect() {
+  const ws = new WebSocket(WS_URL);
+  ws.onmessage = e => {
+    const msg = JSON.parse(e.data);
+    if (msg.type==='full_state') {
+      fullState = msg;
+      applyColors(msg.colors);
+      const digest = overlayDigest(msg);
+      if (digest !== lastDigest) {
+        lastDigest = digest;
+        applyOverlay(msg.overlay||{mode:'hidden'}, msg);
+      }
+      const td = JSON.stringify(msg.titrage_overlay || {});
+      if (td !== lastTitrageDigest) {
+        lastTitrageDigest = td;
+        applyTitrage(msg.titrage_overlay || {});
+      }
+    }
+  };
+  ws.onclose = () => setTimeout(connect, 1500);
+}
+connect();
+</script>
+</body>
+</html>
